@@ -1,0 +1,20 @@
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this file,
+You can obtain one at http://mozilla.org/MPL/2.0/.
+
+This project is a work-in-progress implementation of automated Accessibility Testing Suite for Firefox,
+created by Andrzej Skalski, Mozilla
+
+the code is not runnable yet, although some desing principles are already known:
+
+there will be several platform-dependent test folders (test_*) containing python style unittests in sets
+there might be a single cross-platform test directory for abstracted tests at some point
+
+all configuration is to be placed in "config.ini" file, athough passing other alternative configuration files from commandline will be possible
+
+mats_runner folder is planned to deliver class set that provides a Firefox runner with abstracted interaction interface, to the point it's possible. All platform dependent details will be exposed by fields nested in a main class.
+
+The goal is to keep basic and common setup options as simple as possible, while allowing full platform-specific testing in separate subclasses.
+
+During development I will primarly focus on MSAA tests for now. 
+
