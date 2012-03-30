@@ -3,7 +3,7 @@
 # You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #global variables and imports accordingly to used OS
-#should I move it to constructor?
+#TODO: should I move it to constructor?
 from platform import system
 osname = system()
 if osname == 'Linux':
