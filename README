@@ -16,5 +16,11 @@ mats_runner folder is planned to deliver class set that provides a Firefox runne
 
 The goal is to keep basic and common setup options as simple as possible, while allowing full platform-specific testing in separate subclasses.
 
-During development I will primarly focus on MSAA tests for now. 
+During development I will primarly focus on MSAA tests for now.
+
+Requirements:
+Firefox compiled with --with-marionette and --with-accessibility
+
+for Windows: pyia library, comtypes
+for Linux: pyatspi and probably some more I haven't discovered yet 
 
