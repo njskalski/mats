@@ -9,7 +9,7 @@ from mozprofile import FirefoxProfile
 
     
 class MatsRunner(object):
-    def __init__(self, config_file = '../config.ini'):
+    def __init__(self, config_file):
         self.controller = get_controller()
         print 'Using ' + self.controller.__class__.__name__
         
@@ -18,5 +18,3 @@ class MatsRunner(object):
         self.profile = FirefoxProfile()
         self.runner = FirefoxRunner(self.profile, self.config['Firefox']['binary'])  
     
-    
-runner = MatsRunner()
