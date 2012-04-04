@@ -18,9 +18,19 @@ The goal is to keep basic and common setup options as simple as possible, while 
 
 During development I will primarly focus on MSAA tests for now.
 
-Requirements:
-Firefox compiled with --with-marionette and --with-accessibility
+The idea is that tests are run by python.unittest module
 
-for Windows: pyia library, comtypes
-for Linux: pyatspi and probably some more I haven't discovered yet 
+Requirements:
+for all systems:
+Firefox compiled with --with-marionette and --with-accessibility
+mozbase (https://github.com/mozilla/mozbase)
+
+for Windows:
+comtypes (pip install comtypes)
+pyia (https://github.com/askalski/pyia , run setup.py)
+
+
+for Linux:
+pyatspi
+and probably some more I haven't discovered yet 
 

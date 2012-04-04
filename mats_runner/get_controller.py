@@ -12,7 +12,7 @@ def get_controller():
         controller = MatsAtspiController
     elif osname == 'Windows':
         from mats_msaa_controller import MatsMsaaController
-        controller = MatsMsaaController()
+        controller = MatsMsaaController
     else:
         raise Exception("Unsupported platform " + osname + ".")
     return controller()

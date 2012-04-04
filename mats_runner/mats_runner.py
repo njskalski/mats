@@ -16,5 +16,7 @@ class MatsRunner(object):
         self.config = get_config(config_file)
         
         self.profile = FirefoxProfile()
-        self.runner = FirefoxRunner(self.profile, self.config['Firefox']['binary'])  
-    
+        self.runner = FirefoxRunner(self.profile, self.config['Firefox']['binary'])
+        
+        self.controller.initFirefoxInstance()
+        print 'elo'

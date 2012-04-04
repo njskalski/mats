@@ -2,10 +2,12 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this file,
 # You can obtain one at http://mozilla.org/MPL/2.0/.
 
-from mats_base_controller import MatsBaseController
-import pyia
+# this is a base class for AT controllers used by MATS
 
-class MatsMsaaController(MatsBaseController):
+class MatsBaseController(object):
     def __init__(self):
+        self.FirefoxInstance = None
         pass
 
+    def initFirefoxInstance(self):
+        raise Exception("Unimplemented method in " + self.__class__.__name__)
