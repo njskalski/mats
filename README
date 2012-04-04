@@ -26,7 +26,7 @@ Firefox compiled with --with-marionette and --with-accessibility
 mozbase (https://github.com/mozilla/mozbase)
 
 for Windows:
-comtypes (pip install comtypes)
+comtypes (easy_install comtypes)
 pyia (https://github.com/askalski/pyia , run setup.py)
 
 
