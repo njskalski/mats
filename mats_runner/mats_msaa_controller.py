@@ -9,3 +9,5 @@ class MatsMsaaController(MatsBaseController):
     def __init__(self):
         pass
 
+    def initFirefoxInstance(self):
+        print pyia.getDesktop()

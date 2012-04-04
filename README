@@ -25,9 +25,10 @@ for all systems:
 Firefox compiled with --with-marionette and --with-accessibility
 mozbase (https://github.com/mozilla/mozbase)
 
-for Windows:
+for Windows (unless ctypes error is fixed, only win32 is supported):
 comtypes (easy_install comtypes)
-pyia (https://github.com/askalski/pyia , run setup.py)
+ctypes (watch the OS version, http://switch.dl.sourceforge.net/project/ctypes/ctypes-win64/ contains win64 version, that contains some instructions how to run it, but I had no success trying)
+pyia (https://github.com/askalski/pyia , "python setup.py install")
 
 
 for Linux:

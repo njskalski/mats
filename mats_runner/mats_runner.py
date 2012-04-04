@@ -19,4 +19,3 @@ class MatsRunner(object):
         self.runner = FirefoxRunner(self.profile, self.config['Firefox']['binary'])
         
         self.controller.initFirefoxInstance()
-        print 'elo'
