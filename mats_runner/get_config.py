@@ -2,6 +2,12 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this file,
 # You can obtain one at http://mozilla.org/MPL/2.0/.
 
+#This file provides a get_config function, that either succeeds or raise the exception.
+#If it succeeds, it returns a dictionary of settings, in which following requirements are met:
+#
+#- conf['Firefox'] section exists
+#- conf['Firefox']['binary'] exists and points to an existing file
+
 def get_config(config_file):
     from ConfigParser import ConfigParser
     from os import path
