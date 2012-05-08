@@ -28,10 +28,7 @@ class MatsRunner(object):
             print 'Error: timeout'
             #TODO: add some error handling here
            ''' 
-        # The line below removes firefox stdout from output, since I needed a clean
-        # log for debugging. It probably can be replaced with someting better, but
-        # necessary functions are not exported by MozBase
-        self.FirefoxThread.runner.process_handler.proc.stdout = None
+        
         '''
         mc = Marionette('localhost', self.marionette_port)
         mc.start_session()
