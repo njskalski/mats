@@ -8,19 +8,27 @@ from mozprofile import FirefoxProfile
 from threading import Thread
 import datetime, socket, time
 
+class FirefoxThreadLogger:
+    def __init__(self, output):
+        self.output = output
+        
+    def __call__(self, line):
+        pass
+
 class FirefoxThread(Thread):
     def __init__(self, binary, marionette_port = 2828):
         Thread.__init__(self)
         self.binary = binary
         self.marionette_port = marionette_port
+        self.logger = FirefoxThreadLogger(None)
         
     def run(self):
-        print 'Starting FirefoxProcess'
         self.profile = FirefoxProfile()
         self.profile.set_preferences({"marionette.defaultPrefs.enabled" : True})
-        self.runner = FirefoxRunner(profile = self.profile, binary = self.binary, kp_kwargs = {'stdout' : None})
-        # kp_kwargs are set to remove ff output from MATS output, since I need a clear log
-        
+        self.runner = FirefoxRunner(profile = self.profile,
+                                    binary = self.binary,
+                                    kp_kwargs = {'processOutputLine' : [self.logger]})
+
         self.runner.start()
         self.runner.wait()
         
