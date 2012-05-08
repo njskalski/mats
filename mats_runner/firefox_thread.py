@@ -6,19 +6,46 @@ from mozrunner import FirefoxRunner
 from mozprofile import FirefoxProfile
 
 from threading import Thread
-from time import sleep
+import datetime, socket, time
 
 class FirefoxThread(Thread):
-    def __init__(self, binary):
-        print 'fftconstruct'
+    def __init__(self, binary, marionette_port = 2828):
         Thread.__init__(self)
         self.binary = binary
-        print 'fftconstructed'
+        self.marionette_port = marionette_port
         
     def run(self):
         print 'Starting FirefoxProcess'
         self.profile = FirefoxProfile()
-        self.runner = FirefoxRunner(self.profile, self.binary)
+        self.profile.set_preferences({"marionette.defaultPrefs.enabled" : True})
+        self.runner = FirefoxRunner(profile = self.profile, binary = self.binary, kp_kwargs = {'stdout' : None})
+        # kp_kwargs are set to remove ff output from MATS output, since I need a clear log
         
         self.runner.start()
         self.runner.wait()
+        
+    def waitForMarionettePortOpenReady(self, timeout=300):
+        '''
+        This method can be run by an external thread. Returns True when the port is open, or False on timeout.
+        It's active waiting with 1 sec heartbeat, if you know better solution please mail me.
+        
+        Originally taken from:
+        https://github.com/mozilla/marionette_client/blob/master/marionette/emulator.py#L246
+        '''
+        
+        starttime = datetime.datetime.now()
+        while datetime.datetime.now() - starttime < datetime.timedelta(seconds=timeout):
+            try:
+                sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                sock.connect(('localhost', self.marionette_port))
+                data = sock.recv(16)
+                sock.close()
+                if '"from"' in data:
+                    return True
+            except:
+                import traceback
+                print traceback.format_exc()
+            time.sleep(1)
+        return False
+        
+        
