@@ -13,11 +13,9 @@ parser.add_option('-c', '--config',
                   dest='config',
                   help="alternative config file location",
                   metavar="FILE",
-                  default="../config.ini")
+                  default="config.ini")
 
 args = parser.parse_args()
-#parser.print_help(file=stdout)
 print 'Using config file: ' + args[0].config
-
 
 runner = MatsRunner(args[0].config)
