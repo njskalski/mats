@@ -22,7 +22,7 @@ The idea is that tests are run by python.unittest module
 
 Requirements:
 for all systems:
-Firefox compiled with --with-marionette and --with-accessibility, and ENABLE_MARIONETTE=1 added to $MC/browser/confvars.sh file as described here: https://developer.mozilla.org/en/Marionette/Setup#Running_Marionette_on_Desktop_Firefox_or_B2G_Desktop_builds
+Firefox compiled with --enable-marionette and --enable-accessibility, and ENABLE_MARIONETTE=1 added to $MC/browser/confvars.sh file as described here: https://developer.mozilla.org/en/Marionette/Setup#Running_Marionette_on_Desktop_Firefox_or_B2G_Desktop_builds
 mozbase (https://github.com/mozilla/mozbase)
 installed marionette_client from mozbase
 

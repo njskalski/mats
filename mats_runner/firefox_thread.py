@@ -8,6 +8,8 @@ from mozprofile import FirefoxProfile
 from threading import Thread
 import datetime, socket, time
 
+from sys import stderr
+
 class FirefoxThreadLogger:
     def __init__(self, output):
         self.output = output
@@ -45,10 +47,11 @@ class FirefoxThread(Thread):
         while datetime.datetime.now() - starttime < datetime.timedelta(seconds=timeout):
             try:
                 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                sock.connect(('localhost', self.marionette_port))
+                sock.connect(('127.0.0.1', self.marionette_port))
                 data = sock.recv(16)
                 sock.close()
                 if '"from"' in data:
+                    print 'MATS: sss: ***"' + str(data) + '"***'
                     return True
             except:
                 import traceback
