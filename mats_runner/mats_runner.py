@@ -18,6 +18,8 @@ class MatsRunner(object):
         self.config = get_config(config_file)   #get_config makes sure that the config makes sense. More details in get_config.py
         self.marionette_port = 2828
         
+        self.controller = MatsController()
+        
         print 'MATS: Starting Firefox...'
         self.FirefoxThread = FirefoxThread(self.config['Firefox']['binary'], self.marionette_port)
         self.FirefoxThread.start()
@@ -36,13 +38,24 @@ class MatsRunner(object):
         try:
             m = Marionette('localhost', self.marionette_port)
             m.start_session()
-            print 'MATS: wchodze na onet'
-            m.navigate('onet.pl')
+            print 'MATS: navigating'
+            m.navigate('http://9gag.com/')
             print 'MATS: marionette succeeded'
         except Exception as e:
             print 'MATS: error ***"' + str(e) + '"***'
             import traceback
             print 'MATS: error ***"' + traceback.format_exc() + '"***'
+
+        try:
+            print 'MATS: starting controller'
+            self.controller.grabFirefoxInstance()
+            print 'MATS: controller successful'
+        except:
+            print 'MATS: error ***"' + str(e) + '"***'
+            import traceback
+            print 'MATS: error ***"' + traceback.format_exc() + '"***'
+
+            
             
         print 'MATS: Waiting for Firefox to stop'
         self.FirefoxThread.join()

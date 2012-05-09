@@ -10,5 +10,5 @@ class MatsAtspiController(MatsBaseController):
         MatsBaseController.__init__(self)
         pass
 
-    def initFirefoxInstance(self):        
+    def grabFirefoxInstance(self):        
         raise Exception("This is a placeholder")

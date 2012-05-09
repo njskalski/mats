@@ -26,7 +26,8 @@ class FirefoxThread(Thread):
         
     def run(self):
         self.profile = FirefoxProfile()
-        self.profile.set_preferences({"marionette.defaultPrefs.enabled" : True})
+        self.profile.set_preferences({"marionette.defaultPrefs.enabled" : True,
+                                      "marionette.defaultPrefs.port": 2828})
         self.runner = FirefoxRunner(profile = self.profile,
                                     binary = self.binary,
                                     kp_kwargs = {'processOutputLine' : [self.logger]})
@@ -51,11 +52,12 @@ class FirefoxThread(Thread):
                 data = sock.recv(16)
                 sock.close()
                 if '"from"' in data:
-                    print 'MATS: sss: ***"' + str(data) + '"***'
+                    #print 'MATS: sss: ***"' + str(data) + '"***'
                     return True
             except:
-                import traceback
-                print traceback.format_exc()
+                #import traceback
+                #print traceback.format_exc()
+                pass
             time.sleep(1)
         return False
         
