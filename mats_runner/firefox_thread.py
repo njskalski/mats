@@ -9,6 +9,7 @@ from threading import Thread
 import datetime, socket, time
 
 from sys import stderr
+from utils import runshellnow
 
 class FirefoxThreadLogger:
     def __init__(self, output):
@@ -32,8 +33,14 @@ class FirefoxThread(Thread):
                                     binary = self.binary,
                                     kp_kwargs = {'processOutputLine' : [self.logger]})
 
-        self.runner.start()
+        self.runner.start()        
         self.runner.wait()
+        
+    def getHWND(self):
+        if not self.is_alive():
+            return None
+        else:
+            return self.runner.process_handler.proc_handle.value
         
     def waitForMarionettePortOpenReady(self, timeout=300):
         '''
@@ -43,7 +50,6 @@ class FirefoxThread(Thread):
         Originally taken from:
         https://github.com/mozilla/marionette_client/blob/master/marionette/emulator.py#L246
         '''
-        
         starttime = datetime.datetime.now()
         while datetime.datetime.now() - starttime < datetime.timedelta(seconds=timeout):
             try:

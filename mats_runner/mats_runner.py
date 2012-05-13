@@ -10,56 +10,68 @@ from marionette import Marionette
 
 from time import sleep
 
+from pyshell import *
+from winutils import *
+
+
 class MatsRunner(object):
     def __init__(self, config_file):
         
-        print 'MATS: Using ' + MatsController.__name__
+        print 'Using ' + MatsController.__name__
         
         self.config = get_config(config_file)   #get_config makes sure that the config makes sense. More details in get_config.py
         self.marionette_port = 2828
         
         self.controller = MatsController()
         
-        print 'MATS: Starting Firefox...'
+        print 'Starting Firefox...'
         self.FirefoxThread = FirefoxThread(self.config['Firefox']['binary'], self.marionette_port)
         self.FirefoxThread.start()
         
         portReady = self.FirefoxThread.waitForMarionettePortOpenReady() 
         
         if portReady:
-            print 'MATS: Marionette port open'
+            print 'Marionette port open'
         else:
-            print 'MATS: Error: timeout'
+            print 'Error: timeout'
             #TODO: add some error handling here
             return
-        
-        sleep(4)
          
+        sleep(4)
+        
         try:
+            print 'connecting'
             m = Marionette('localhost', self.marionette_port)
+            print 'starting session'
             m.start_session()
-            print 'MATS: navigating'
+            print 'navigating'
             m.navigate('http://9gag.com/')
-            print 'MATS: marionette succeeded'
+            print 'marionette succeeded'
         except Exception as e:
-            print 'MATS: error ***"' + str(e) + '"***'
+            print 'error ***"' + str(e) + '"***'
             import traceback
-            print 'MATS: error ***"' + traceback.format_exc() + '"***'
+            print 'error ***"' + traceback.format_exc() + '"***'
 
-        try:
-            print 'MATS: starting controller'
-            self.controller.grabFirefoxInstance()
-            print 'MATS: controller successful'
-        except:
-            print 'MATS: error ***"' + str(e) + '"***'
-            import traceback
-            print 'MATS: error ***"' + traceback.format_exc() + '"***'
-
+#        try:
+#            print 'starting controller'
+#            self.controller.grabFirefoxInstance()
+#            print 'controller successful'
+#            sleep(9)
+#            
+#        except Exception as e:
+#            print 'error ***"' + str(e) + '"***'
+#            import traceback
+#            print 'error ***"' + traceback.format_exc() + '"***'
             
-            
-        print 'MATS: Waiting for Firefox to stop'
+        print 'Waiting for Firefox to stop'
+        runShellHere()
         self.FirefoxThread.join()
-        print 'MATS: Program ends'
+#        
+#        print 'stoping controller'
+#        self.controller.finish()
+#        print 'controller off'
+        print 'Program ends'
+        
         
         
         
