@@ -38,7 +38,7 @@ class MatsRunner(object):
             #TODO: add some error handling here
             return
          
-        sleep(4)
+        sleep(7)
         
         try:
             print 'connecting'
@@ -59,13 +59,13 @@ class MatsRunner(object):
             fall(e)
             
         print 'Waiting for Firefox to stop'
-        runShellHere({'runner' : self})
+        
+        #runShellHere({'runner' : self})
         
         self.FirefoxThread.join()
-#        
-#        print 'stoping controller'
-#        self.controller.finish()
-#        print 'controller off'
+       
+        self.controller.finish()
+    
         print 'Program ends'
         
         

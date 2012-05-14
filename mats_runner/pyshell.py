@@ -11,7 +11,7 @@ class FileCacher:
     def reset(self): self.out = []
     def write(self,line): self.out.append(line)
     def flush(self):
-        output = '\n'.join(self.out)
+        output = ''.join(self.out)
         self.reset()
         return output
 

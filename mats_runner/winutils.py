@@ -1,5 +1,6 @@
 import win32gui
 import ctypes
+import ctypes.wintypes
 import comtypes
 import comtypes.client
 import winconstants
@@ -9,53 +10,74 @@ from threading import Thread, Lock
 
 class ListenerThread(Thread):
     def __init__(self):
+        Thread.__init__(self)
         self._active = True
         self._activeLock = Lock()
         
         #http://msdn.microsoft.com/en-us/library/windows/desktop/aa383751%28v=vs.85%29.aspx
-        self.callback_function_prototype = ctypes.CFUNCTYPE(
-            ctypes.c_voidp, #hWinEventHook, actually HWINEVENTHOOK, which is defined as HANDLE in WinNT.h = void*
-            ctypes.c_uint32, #event, actually DWORD
-            ctypes.c_uint32, #hwnd
-            ctypes.c_int32, #idObject
-            ctypes.c_int32, #idChild
-            ctypes.c_uint32, #dwEventThread, actually DWORD
-            ctypes.c_uint32, #dwmsEventTime, actually DWORD
+        self.callback_function_prototype = ctypes.WINFUNCTYPE(
+            #first argument is THE RETURN TYPE as in documentation of ctypes.
+            None,
+            #now here are the real arguments
+            ctypes.wintypes.HANDLE, #hWinEventHook, actually HWINEVENTHOOK, which is defined as HANDLE in WinNT.h
+            ctypes.wintypes.DWORD, #event
+            ctypes.wintypes.HWND, #hwnd
+            ctypes.wintypes.LONG, #idObject
+            ctypes.wintypes.LONG, #idChild
+            ctypes.wintypes.DWORD, #dwEventThread
+            ctypes.wintypes.DWORD, #dwmsEventTime
             )
+        
+        print dir(self.callback_function_prototype)
+        
         self.callback_function = self.callback_function_prototype(WinEventProc)
+        print dir(self.callback_function)
+        print 'callback res:' + str(self.callback_function.restype)
+        print 'callback args:' + str(self.callback_function.argtypes)
     
     def run(self):
         print 'Starting Listener'
         #http://msdn.microsoft.com/en-us/library/windows/desktop/dd373640%28v=vs.85%29.aspx
         self.callback_function_hook = ctypes.windll.user32.SetWinEventHook(
-            ctypes.c_uint32(winconstants.eventNameToInt['EVENY_MIN']),
-            ctypes.c_uint32(winconstants.eventNameToInt['EVENY_MAX']),
-            0,
+            ctypes.wintypes.UINT(winconstants.eventNameToInt['EVENT_MIN']),
+            ctypes.wintypes.UINT(winconstants.eventNameToInt['EVENT_MAX']),
+            ctypes.wintypes.UINT(0),
             self.callback_function,
-            0, # 0 means all processes #TODO narrow that
-            0, # 0 means all threads
-            winconstants.WINEVENT_OUTOFCONTEXT
+            ctypes.wintypes.UINT(0), # 0 means all processes #TODO narrow that
+            ctypes.wintypes.UINT(0), # 0 means all threads
+            ctypes.wintypes.UINT(winconstants.WINEVENT_OUTOFCONTEXT)
             )                                
+        
+        print 'callback function hook: ' + str(self.callback_function_hook)
         
         while True:
             with self._activeLock:
                 if not self._active:
                     break
-            comtypes.client.PumpEvents(5) #TODO rethink that
-            pass
+            win32gui.PumpWaitingMessages() #TODO rethink that
+            sleep(2)
+            #print('e'),
+        print ''
+        
+        unhook_result = ctypes.windll.user32.UnhookWinEvent(self.callback_function_hook)
+        print "Unhooking result: " + str(ctypes.c_bool(unhook_result))
         
     def stop(self):
+        '''
+        This is called by a separate thread!
+        '''
         with self._activeLock:
             self._active = False
         
-        unhook_result = ctypes.windll.user32.UnhookWinEvent(self.callback_function_hook)
-        print "Unhooking result = " + str(unhook_result)
         self.join(20) #TODO think this down
         print 'Listener stopped'
     
 #http://msdn.microsoft.com/en-us/library/windows/desktop/dd373885%28v=vs.85%29.aspx    
 def WinEventProc(hWinEventHook, event, hwnd, idObject, idChild, dwEventThread, dwmsEventTime):
-    print str(event)
+    if event in winconstants.eventIntToName.keys():
+        print winconstants.eventIntToName[event]
+    else:
+        print '.',
 
 def loadIAccessible():
     '''
@@ -74,6 +96,9 @@ def getWindowsByName(name):
             res.append( (hwnd, title))
     win32gui.EnumWindows(getNightliesCallback, result)
     return result
+
+def getProcessFromHwnd(hwnd):
+    return ctypes.oledll.oleacc.GetProcessHandleFromHwnd(ctypes.wintypes.HWND(hwnd))
 
 def getNightlies():
     return getWindowsByName('Nightly')
