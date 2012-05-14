@@ -3,22 +3,20 @@
 # You can obtain one at http://mozilla.org/MPL/2.0/.
 
 from mats_base_controller import MatsBaseController
-
-from threading import Thread, Semaphore
 import winutils
 
 class MatsMsaaController(MatsBaseController):
     def __init__(self): 
-        pass
+        self.listenerThread = winutils.ListenerThread()
 
     def start(self):
         self.hwnd = self.getFirefoxHwnd()
         self.IAccessible = winutils.loadIAccessible()
         self.AccessibleObject = winutils.getAccessibleObjectFromWindow(self.hwnd)
-        pass
+        self.listenerThread.start()
         
     def finish(self):
-        pass
+        self.listenerThread.stop()
 
     def getFirefoxHwnd(self):
         Nightlies = winutils.getNightlies()
@@ -27,4 +25,4 @@ class MatsMsaaController(MatsBaseController):
         if len(Nightlies) > 1:
             print 'WARNING: more than one instance of Nightly found, using first one.'
         return Nightlies[0][0]
-         
+    

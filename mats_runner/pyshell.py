@@ -2,7 +2,7 @@
 
 import sys
 from code import InteractiveConsole
-from traceback import format_exc
+import traceback
 from itertools import chain 
 
 class FileCacher:
@@ -14,6 +14,30 @@ class FileCacher:
         output = '\n'.join(self.out)
         self.reset()
         return output
+
+class superHandler:
+    class callHandler:
+        def __init__(self, name):
+            self.name = name
+        
+        def __call__(self, *args, **kwargs):
+            print self.name,args,kwargs
+        
+        def lookup(self, name):
+            print 'someone is looking for "' + name + '" in "' + self.name + '...'
+            
+        def __getattribute__(self,name):
+            self.lookup(name)
+            return callHandler(name)
+        
+        def __getattr__(self, name):
+            return self.__getattribute__(name)
+    
+    def __getattr__(self,name):
+        return self.callHandler(name)
+    
+    def __getattribute__(self,name):
+        return self.__getattr__(name)
 
 class Shell(InteractiveConsole):
     "Wrapper around Python that can filter input/output to the shell"
