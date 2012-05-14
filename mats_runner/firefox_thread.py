@@ -52,19 +52,22 @@ class FirefoxThread(Thread):
         '''
         starttime = datetime.datetime.now()
         while datetime.datetime.now() - starttime < datetime.timedelta(seconds=timeout):
+            print '.',
             try:
                 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 sock.connect(('127.0.0.1', self.marionette_port))
                 data = sock.recv(16)
                 sock.close()
                 if '"from"' in data:
-                    #print 'MATS: sss: ***"' + str(data) + '"***'
+                    print ''
                     return True
             except:
                 #import traceback
                 #print traceback.format_exc()
                 pass
+            
             time.sleep(1)
+        print ''
         return False
         
         

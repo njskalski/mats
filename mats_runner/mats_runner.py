@@ -24,9 +24,10 @@ class MatsRunner(object):
         
         self.controller = MatsController()
         
-        print 'Starting Firefox...'
+        print 'Starting Nightly...'
         self.FirefoxThread = FirefoxThread(self.config['Firefox']['binary'], self.marionette_port)
         self.FirefoxThread.start()
+        print 'Waiting for Marionette port to open (' + str(self.marionette_port) + ')'
         
         portReady = self.FirefoxThread.waitForMarionettePortOpenReady() 
         
@@ -48,23 +49,18 @@ class MatsRunner(object):
             m.navigate('http://9gag.com/')
             print 'marionette succeeded'
         except Exception as e:
-            print 'error ***"' + str(e) + '"***'
-            import traceback
-            print 'error ***"' + traceback.format_exc() + '"***'
+            fall(e)
 
-#        try:
-#            print 'starting controller'
-#            self.controller.grabFirefoxInstance()
-#            print 'controller successful'
-#            sleep(9)
-#            
-#        except Exception as e:
-#            print 'error ***"' + str(e) + '"***'
-#            import traceback
-#            print 'error ***"' + traceback.format_exc() + '"***'
+        try:
+            print 'starting controller'
+            self.controller.start()
+            print 'controller successful'
+        except Exception as e:
+            fall(e)
             
         print 'Waiting for Firefox to stop'
-        runShellHere()
+        runShellHere({'runner' : self})
+        
         self.FirefoxThread.join()
 #        
 #        print 'stoping controller'

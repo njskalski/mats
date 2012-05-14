@@ -2,6 +2,8 @@
 
 import sys
 from code import InteractiveConsole
+from traceback import format_exc
+from itertools import chain 
 
 class FileCacher:
     "Cache the stdout text so we can analyze it before returning it"
@@ -15,10 +17,14 @@ class FileCacher:
 
 class Shell(InteractiveConsole):
     "Wrapper around Python that can filter input/output to the shell"
-    def __init__(self):
+    def __init__(self, defs = {}):
         self.stdout = sys.stdout
         self.cache = FileCacher()
-        InteractiveConsole.__init__(self, globals())
+        
+        #merging envrironments
+        env = {k : v for k, v in chain(globals().iteritems(), defs.iteritems())}
+        
+        InteractiveConsole.__init__(self, env)
         return
 
     def get_output(self): sys.stdout = self.cache
@@ -36,12 +42,19 @@ class Shell(InteractiveConsole):
         print output # or do something else with it
         return 
 
-def runShellHere():
-    s = Shell()
+def runShellHere(defs = {}):
+    s = Shell(defs)
     s.interact()
 
 def gf(obj, infix):
     for field in dir(obj):
         if infix in field:
             print field,
-            
+
+def fall(e):
+    print 'Exception fall: ' + str(e.__class__)
+    print traceback.format_exc()
+
+def falee(e):
+    fall(e)
+    runShellHere()

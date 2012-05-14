@@ -9,7 +9,7 @@ class MatsBaseController(object):
         self.FirefoxInstance = None
         pass
 
-    def grabFirefoxInstance(self):
+    def start(self):
         raise Exception("Unimplemented method in " + self.__class__.__name__)
     
     def finish(self):
