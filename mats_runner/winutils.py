@@ -10,7 +10,7 @@ import comtypes.client
 import winconstants
 from time import sleep
 
-from threading import Thread, Lock
+from threading import Thread, Event
 
 class ListenerThread(Thread):
     _singleInstance = None
@@ -28,8 +28,7 @@ class ListenerThread(Thread):
     def __init__(self, hwnd, pid):
         Thread.__init__(self)
         
-        self._active = True
-        self._activeLock = Lock()
+        self._activeEvent = Event()
         self.hwnd = hwnd
         self.pid = pid
         #self.processId = getProcessFromHwnd(self.hwnd)
@@ -67,12 +66,10 @@ class ListenerThread(Thread):
         
         print 'callback function hook: ' + str(self.callback_function_hook)
         
-        while True:
-            with self._activeLock:
-                if not self._active:
-                    break
+        self._activeEvent.set()
+        while self._activeEvent.is_set():
             win32gui.PumpWaitingMessages() #TODO rethink that
-            sleep(2)
+            sleep(1)
     
         unhook_result = ctypes.windll.user32.UnhookWinEvent(self.callback_function_hook)
         print "Unhooking result: " + str(ctypes.c_bool(unhook_result))
@@ -81,10 +78,8 @@ class ListenerThread(Thread):
         '''
         This is called by a separate thread!
         '''
-        with self._activeLock:
-            self._active = False
-        
-        self.join(20) #TODO think this down
+        self._activeEvent.clear()   #shutting down the loop
+        self.join(20)               #waiting ListenerThread to finish
         print 'Listener stopped'
     
 #http://msdn.microsoft.com/en-us/library/windows/desktop/dd373885%28v=vs.85%29.aspx    
