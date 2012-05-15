@@ -22,15 +22,18 @@ class MatsRunner(object):
         self.config = get_config(config_file)   #get_config makes sure that the config makes sense. More details in get_config.py
         self.marionette_port = 2828
         
-        self.controller = MatsController()
+        
         
         print 'Starting Nightly...'
         self.FirefoxThread = FirefoxThread(self.config['Firefox']['binary'], self.marionette_port)
         self.FirefoxThread.start()
+        
+        print 'Creating controller'
+        pid = self.FirefoxThread.getPID() # this is blocking function!
+        self.controller = MatsController(pid)
+        
         print 'Waiting for Marionette port to open (' + str(self.marionette_port) + ')'
-        
-        portReady = self.FirefoxThread.waitForMarionettePortOpenReady() 
-        
+        portReady = self.FirefoxThread.waitForMarionettePortOpenReady()
         if portReady:
             print 'Marionette port open'
         else:

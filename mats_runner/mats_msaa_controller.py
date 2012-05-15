@@ -6,13 +6,18 @@ from mats_base_controller import MatsBaseController
 import winutils
 
 class MatsMsaaController(MatsBaseController):
-    def __init__(self): 
-        self.listenerThread = winutils.ListenerThread()
-
+    def __init__(self, pid):
+        MatsBaseController.__init__(self,pid)
+        
     def start(self):
         self.hwnd = self.getFirefoxHwnd()
+        
+        #just some shortcuts
         self.IAccessible = winutils.loadIAccessible()
-        self.AccessibleObject = winutils.getAccessibleObjectFromWindow(self.hwnd)
+        self.AccessibleObject = winutils.getAccessibleObjectFromWindow(hwnd = self.hwnd)
+        
+        #starting listener
+        self.listenerThread = winutils.ListenerThread(hwnd = self.hwnd, pid = self.pid)
         self.listenerThread.start()
         
     def finish(self):

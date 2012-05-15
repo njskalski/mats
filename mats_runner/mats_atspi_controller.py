@@ -6,8 +6,8 @@ from mats_base_controller import MatsBaseController
 import pyatspi
 
 class MatsAtspiController(MatsBaseController):
-    def __init__(self):
-        MatsBaseController.__init__(self)
+    def __init__(self, pid):
+        MatsBaseController.__init__(self, pid)
         pass
 
     def start(self):        

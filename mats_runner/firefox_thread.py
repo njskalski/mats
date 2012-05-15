@@ -5,7 +5,7 @@
 from mozrunner import FirefoxRunner
 from mozprofile import FirefoxProfile
 
-from threading import Thread
+from threading import Thread, Event
 import datetime, socket, time
 
 from sys import stderr
@@ -14,7 +14,7 @@ from utils import runshellnow
 class FirefoxThreadLogger:
     def __init__(self, output):
         self.output = output
-        
+
     def __call__(self, line):
         pass
 
@@ -24,6 +24,8 @@ class FirefoxThread(Thread):
         self.binary = binary
         self.marionette_port = marionette_port
         self.logger = FirefoxThreadLogger(None)
+        self._firefoxRunningEvent = Event()
+        
         
     def run(self):
         self.profile = FirefoxProfile()
@@ -33,14 +35,18 @@ class FirefoxThread(Thread):
                                     binary = self.binary,
                                     kp_kwargs = {'processOutputLine' : [self.logger]})
 
-        self.runner.start()        
+        self.runner.start()
+        self._firefoxRunningEvent.set()
         self.runner.wait()
         
-    def getHWND(self):
-        if not self.is_alive():
-            return None
-        else:
-            return self.runner.process_handler.proc_handle.value
+    def getPID(self):
+        '''
+        This is called by external threads, and starts to exist only after the
+        FirefoxRunner have some time to process. It must be blocking then.
+        '''
+        self._firefoxRunningEvent.wait()
+        return self.runner.process_handler.proc.pid
+        
         
     def waitForMarionettePortOpenReady(self, timeout=300):
         '''

@@ -5,8 +5,9 @@
 # this is a base class for AT controllers used by MATS
 
 class MatsBaseController(object):
-    def __init__(self):
+    def __init__(self, pid):
         self.FirefoxInstance = None
+        self.pid = pid
         pass
 
     def start(self):

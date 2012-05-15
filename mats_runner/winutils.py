@@ -1,3 +1,7 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this file,
+# You can obtain one at http://mozilla.org/MPL/2.0/.
+
 import win32gui
 import ctypes
 import ctypes.wintypes
@@ -9,10 +13,28 @@ from time import sleep
 from threading import Thread, Lock
 
 class ListenerThread(Thread):
-    def __init__(self):
+    _singleInstance = None
+    
+    # ListenerThread needs to be global (singleton pattern), since
+    # WinEventProc cannot receive additional 'self' argument, so it
+    # cannot be bound with a particular object instance.
+    # Sorry, MS discovered delegates 10 years later.
+    def __new__(cls, *args, **kwargs):
+        if not cls._singleInstance:
+            cls._singleInstance = super(ListenerThread, cls).__new__(
+                                cls, *args, **kwargs)
+        return cls._singleInstance
+    
+    def __init__(self, hwnd, pid):
         Thread.__init__(self)
+        
         self._active = True
         self._activeLock = Lock()
+        self.hwnd = hwnd
+        self.pid = pid
+        #self.processId = getProcessFromHwnd(self.hwnd)
+        
+        Listener = self
         
         #http://msdn.microsoft.com/en-us/library/windows/desktop/aa383751%28v=vs.85%29.aspx
         self.callback_function_prototype = ctypes.WINFUNCTYPE(
@@ -28,22 +50,17 @@ class ListenerThread(Thread):
             ctypes.wintypes.DWORD, #dwmsEventTime
             )
         
-        print dir(self.callback_function_prototype)
-        
         self.callback_function = self.callback_function_prototype(WinEventProc)
-        print dir(self.callback_function)
-        print 'callback res:' + str(self.callback_function.restype)
-        print 'callback args:' + str(self.callback_function.argtypes)
-    
+        
     def run(self):
-        print 'Starting Listener'
+        print 'Starting Listener for process ' + str(self.pid)
         #http://msdn.microsoft.com/en-us/library/windows/desktop/dd373640%28v=vs.85%29.aspx
         self.callback_function_hook = ctypes.windll.user32.SetWinEventHook(
             ctypes.wintypes.UINT(winconstants.eventNameToInt['EVENT_MIN']),
             ctypes.wintypes.UINT(winconstants.eventNameToInt['EVENT_MAX']),
-            ctypes.wintypes.UINT(0),
+            None,#ctypes.wintypes.UINT(0), #null, since we use WINEVENT_OUTOFCONTEXT
             self.callback_function,
-            ctypes.wintypes.UINT(0), # 0 means all processes #TODO narrow that
+            ctypes.wintypes.DWORD(self.pid), #were watching only Nightly's process
             ctypes.wintypes.UINT(0), # 0 means all threads
             ctypes.wintypes.UINT(winconstants.WINEVENT_OUTOFCONTEXT)
             )                                
@@ -56,9 +73,7 @@ class ListenerThread(Thread):
                     break
             win32gui.PumpWaitingMessages() #TODO rethink that
             sleep(2)
-            #print('e'),
-        print ''
-        
+    
         unhook_result = ctypes.windll.user32.UnhookWinEvent(self.callback_function_hook)
         print "Unhooking result: " + str(ctypes.c_bool(unhook_result))
         
@@ -75,9 +90,18 @@ class ListenerThread(Thread):
 #http://msdn.microsoft.com/en-us/library/windows/desktop/dd373885%28v=vs.85%29.aspx    
 def WinEventProc(hWinEventHook, event, hwnd, idObject, idChild, dwEventThread, dwmsEventTime):
     if event in winconstants.eventIntToName.keys():
-        print winconstants.eventIntToName[event]
-    else:
-        print '.',
+        print winconstants.eventIntToName[event],
+    
+        if hwnd == ListenerThread._singleInstance.hwnd:
+            print '\t\t (HWND match)',
+        
+        print '\n'
+        return
+    
+    if hwnd == ListenerThread._singleInstance.hwnd:
+        print 'unknown event, but HWND matches'
+    
+    
 
 def loadIAccessible():
     '''
@@ -98,7 +122,7 @@ def getWindowsByName(name):
     return result
 
 def getProcessFromHwnd(hwnd):
-    return ctypes.oledll.oleacc.GetProcessHandleFromHwnd(ctypes.wintypes.HWND(hwnd))
+    return ctypes.oledll.oleacc.GetProcessHandleFromHwnd(hwnd)
 
 def getNightlies():
     return getWindowsByName('Nightly')
