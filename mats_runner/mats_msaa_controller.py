@@ -46,7 +46,8 @@ class MatsMsaaController(MatsBaseController):
             try:
                 Nightlies = winutils.getNightlies()
             except winutils.NightlyWindowNotFoundException as ne:
-                sleep(1)
+                pass
+            sleep(1)
             
         if len(Nightlies) > 1:
             print 'WARNING: more than one instance of Nightly found, using first one.'
