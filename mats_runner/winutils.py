@@ -90,17 +90,18 @@ class ListenerThread(Thread):
     
 #http://msdn.microsoft.com/en-us/library/windows/desktop/dd373885%28v=vs.85%29.aspx    
 def WinEventProc(hWinEventHook, event, hwnd, idObject, idChild, dwEventThread, dwmsEventTime):
-    if event in winconstants.eventIntToName.keys():
-        print winconstants.eventIntToName[event],
-    
-        if hwnd == ListenerThread._singleInstance.hwnd:
-            print '\t\t (HWND match)',
-        
-        print '\n'
-        return
-    
-    if hwnd == ListenerThread._singleInstance.hwnd:
-        print 'unknown event, but HWND matches'
+    pass
+#    if event in winconstants.eventIntToName.keys():
+#        print winconstants.eventIntToName[event],
+#    
+#        if hwnd == ListenerThread._singleInstance.hwnd:
+#            print '\t\t (HWND match)',
+#        
+#        print '\n'
+#        return
+#    
+#    if hwnd == ListenerThread._singleInstance.hwnd:
+#        print 'unknown event, but HWND matches'
     
     
 
