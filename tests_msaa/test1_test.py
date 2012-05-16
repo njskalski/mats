@@ -2,24 +2,16 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this file,
 # You can obtain one at http://mozilla.org/MPL/2.0/.
 
-'''
+
 class BasicA11yTester(unittest.TestCase):
     def setUp(self):
-        self.firefox_thread = AccessibleFirefoxThread()
-        self.firefox_thread.start()
+        self.runner = MatsRunner(webpage = 'file://./pages/test1.html')
         
     def test_whatever(self):
-        time.sleep(20)
-        self.assertTrue(self.firefox_thread.runner.is_running(), 'firefox not running')
+        pass
         
     def tearDown(self):
-        self.firefox_thread.stop()
-        pass
-
-
-
-
+        self.runner.stop()
 
 if __name__ == '__main__':
     unittest.main()
-'''

@@ -12,6 +12,9 @@ from time import sleep
 
 from threading import Thread, Event
 
+class NightlyWindowNotFoundException(Exception):
+    pass
+
 class ListenerThread(Thread):
     _singleInstance = None
     
@@ -73,7 +76,10 @@ class ListenerThread(Thread):
     
         unhook_result = ctypes.windll.user32.UnhookWinEvent(self.callback_function_hook)
         print "Unhooking result: " + str(ctypes.c_bool(unhook_result))
-        
+    
+    def wait_for_ready(self, timeout = None):
+        self._activeEvent.wait(timeout)
+    
     def stop(self):
         '''
         This is called by a separate thread!
@@ -109,18 +115,22 @@ def loadIAccessible():
 
 def getWindowsByName(name):
     result = []
-    def getNightliesCallback(hwnd, res):
+    def getWindowCallback(hwnd, res):
         title = win32gui.GetWindowText(hwnd)
         if name in title:
-            res.append( (hwnd, title))
-    win32gui.EnumWindows(getNightliesCallback, result)
+            res.append( (hwnd, title) )
+    win32gui.EnumWindows(getWindowCallback, result)
     return result
 
 def getProcessFromHwnd(hwnd):
     return ctypes.oledll.oleacc.GetProcessHandleFromHwnd(hwnd)
 
 def getNightlies():
-    return getWindowsByName('Nightly')
+    nightlies = getWindowsByName('Nightly') 
+    if len(nightlies) > 0:
+        return nightlies
+    else: 
+        raise NightlyWindowNotFoundException("Nightly window not found")
 
 def getAccessibleObjectFromWindow(hwnd):
     ptr = ctypes.POINTER(comtypes.gen.Accessibility.IAccessible)()

@@ -13,65 +13,82 @@ from time import sleep
 from pyshell import *
 from winutils import *
 
+from threading import Thread, Event
 
-class MatsRunner(object):
-    def __init__(self, config_file):
+
+class MatsRunner(Thread):
+    def __init__(self, config_file = 'config.ini', url = 'about:blank'):
+        Thread.__init__(self)
+        self.config_file = config_file
+        self.url = url
+        self._ready = Event()
         
-        print 'Using ' + MatsController.__name__
+    def run(self):
+        '''
+        This method starts MATS.
+        '''
         
-        self.config = get_config(config_file)   #get_config makes sure that the config makes sense. More details in get_config.py
-        self.marionette_port = 2828
+        print 'Using ' + MatsController.__name__ + ' as controller.'
+        print 'Loading config from "' + self.config_file + '"...',
+        self.config = get_config(self.config_file)   #get_config makes sure that the config makes sense. More details in get_config.py
+        self.marionette_port = self.config['Marionette']['port'] 
+        print 'OK'
         
-        
-        
-        print 'Starting Nightly...'
+        print 'Starting Firefox/Nightly from "' + self.config['Firefox']['binary'] + '" with Marionette on port ' + str(self.marionette_port) + '.'        
         self.FirefoxThread = FirefoxThread(self.config['Firefox']['binary'], self.marionette_port)
         self.FirefoxThread.start()
         
         print 'Creating controller'
-        pid = self.FirefoxThread.getPID() # this is blocking function!
+        pid = self.FirefoxThread.getPID() # this function blocks until PID is available from FirefoxThread
         self.controller = MatsController(pid)
         
+        print 'Starting controller'
+        self.controller.start()
+        self.controller.wait_for_ready()
+        
         print 'Waiting for Marionette port to open (' + str(self.marionette_port) + ')'
-        portReady = self.FirefoxThread.waitForMarionettePortOpenReady()
+        portReady = self.FirefoxThread.waitForMarionettePortOpenReady(self.config['Marionette']['port_timeout'])
         if portReady:
             print 'Marionette port open'
         else:
-            print 'Error: timeout'
-            #TODO: add some error handling here
-            return
-         
-        sleep(7)
+            print 'Error: timeout, shutting down MATS'
+            self.controller.stop()
+            self.FirefoxThread.stop()
+        
+        #TODO: remove line below once https://bugzilla.mozilla.org/show_bug.cgi?id=753273 is fixed
+        sleep(10)
         
         try:
-            print 'connecting'
+            print 'Starting Marionette'
             m = Marionette('localhost', self.marionette_port)
-            print 'starting session'
+            #TODO: move starting session and navigation to separate methods
+            print 'Starting session'
             m.start_session()
-            print 'navigating'
-            m.navigate('http://9gag.com/')
-            print 'marionette succeeded'
+            print 'Navigating to ' + self.url
+            m.navigate(self.url)
         except Exception as e:
+            print 'Error starting Marionette'
             fall(e)
+            self.controller.stop()
+            self.FirefoxThread.stop()
 
-        try:
-            print 'starting controller'
-            self.controller.start()
-            print 'controller successful'
-        except Exception as e:
-            fall(e)
-            
-        print 'Waiting for Firefox to stop'
-        
-        #runShellHere({'runner' : self})
-        
+        print 'MATS up and running. Waiting until Firefox/Nightly to stops.'
+        self._ready.set()
         self.FirefoxThread.join()
-       
-        self.controller.finish()
+        print 'Stopping controller'
+        self.controller.stop()
+        self.controller.join()
+        print 'MATS runner finishes.'
     
-        print 'Program ends'
-        
-        
-        
-        
+    def wait_until_ready(self, timeout = None):
+        '''
+        To be called by external thread. Blocks until MATS runner is ready to receive commands
+        '''
+        self._ready.wait(timeout)
+    
+    def stop(self):
+        '''
+        To be called by external thread. Stops MATS runner.
+        '''
+        self.FirefoxThread.stop()
         

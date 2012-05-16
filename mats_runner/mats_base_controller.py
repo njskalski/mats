@@ -3,15 +3,18 @@
 # You can obtain one at http://mozilla.org/MPL/2.0/.
 
 # this is a base class for AT controllers used by MATS
+# controllers are threads :( since they pretend applications using accessible
+# interface
 
-class MatsBaseController(object):
+from threading import Thread, Event
+
+class MatsBaseController(Thread):
     def __init__(self, pid):
-        self.FirefoxInstance = None
+        Thread.__init__(self)
         self.pid = pid
-        pass
 
-    def start(self):
+    def run(self):
         raise Exception("Unimplemented method in " + self.__class__.__name__)
     
-    def finish(self):
+    def stop(self):
         raise Exception("Unimplemented method in " + self.__class__.__name__)

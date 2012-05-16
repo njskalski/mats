@@ -28,6 +28,10 @@ class FirefoxThread(Thread):
         
         
     def run(self):
+        '''
+        Starts Firefox thread with Marionette turned on.
+        '''
+        
         self.profile = FirefoxProfile()
         self.profile.set_preferences({"marionette.defaultPrefs.enabled" : True,
                                       "marionette.defaultPrefs.port": 2828})
@@ -39,16 +43,22 @@ class FirefoxThread(Thread):
         self._firefoxRunningEvent.set()
         self.runner.wait()
         
+    def stop(self):
+        '''
+        Stops Firefox/Nightly. To be called by external thread.
+        '''
+        self.runner.stop()
+        
     def getPID(self):
         '''
-        This is called by external threads, and starts to exist only after the
-        FirefoxRunner have some time to process. It must be blocking then.
+        This is called by external threads, and blocks until PID is available in FirefoxRunner,
+        which is shortly after start() has been called. 
         '''
         self._firefoxRunningEvent.wait()
         return self.runner.process_handler.proc.pid
         
         
-    def waitForMarionettePortOpenReady(self, timeout=300):
+    def waitForMarionettePortOpenReady(self, timeout):
         '''
         This method can be run by an external thread. Returns True when the port is open, or False on timeout.
         It's active waiting with 1 sec heartbeat, if you know better solution please mail me.
@@ -58,14 +68,12 @@ class FirefoxThread(Thread):
         '''
         starttime = datetime.datetime.now()
         while datetime.datetime.now() - starttime < datetime.timedelta(seconds=timeout):
-            print '.',
             try:
                 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 sock.connect(('127.0.0.1', self.marionette_port))
                 data = sock.recv(16)
                 sock.close()
                 if '"from"' in data:
-                    print ''
                     return True
             except:
                 #import traceback

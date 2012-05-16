@@ -1,0 +1,7 @@
+MatsRunner is a thread. It's life cycle is as follows:
+
+1) it reads config file and asserts it's correct
+2) it creates FirefoxThread, which wraps MozRunner
+3) it waits for FirefoxThread to provide Firefox's PID, which is necessary for 4
+4) it creates a system-specific Controller, which is a thread, and feeds it with FF's PID
+5)

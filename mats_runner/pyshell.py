@@ -79,6 +79,6 @@ def fall(e):
     print 'Exception fall: ' + str(e.__class__)
     print traceback.format_exc()
 
-def falee(e):
+def falle(e, defs = {}):
     fall(e)
-    runShellHere()
+    runShellHere(defs)

@@ -7,6 +7,7 @@
 from sys import argv, stdout
 from optparse import OptionParser
 from mats_runner import MatsRunner
+from mats_runner.pyshell import falle
 
 parser = OptionParser()
 parser.add_option('-c', '--config',
@@ -19,3 +20,12 @@ args = parser.parse_args()
 print 'Using config file: ' + args[0].config
 
 runner = MatsRunner(args[0].config)
+try:
+    runner.start()
+    runner.join()
+    print 'bye!'
+#except KeyboardInterrupt:
+#    runner.stop()
+except Exception as e:
+    falle(e, {'runner' : runner})
+    
