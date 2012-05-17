@@ -43,6 +43,10 @@ def get_config(config_file):
     from ConfigParser import ConfigParser
     from os import path
     
+    
+    if not path.exists(config_file):
+        raise Exception('Config file "' + config_file + '" not found.')
+    
     config = ConfigParser()
     config.read(config_file)
     

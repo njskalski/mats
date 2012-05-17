@@ -15,7 +15,6 @@ from winutils import *
 
 class MatsRunner(object):
     def __init__(self, config_file = 'config.ini', url = 'about:blank'):
-        Thread.__init__(self)
         self.config_file = config_file
         self.url = url
         
@@ -61,7 +60,7 @@ class MatsRunner(object):
             print 'Starting session'
             self.marionette.start_session()
             print 'Navigating to ' + self.url
-            self.marionette.navigate(self.url)
+            print self.marionette.navigate(self.url)
         except Exception as e:
             print 'Error starting Marionette'
             fall(e)
@@ -69,7 +68,14 @@ class MatsRunner(object):
             self.FirefoxThread.stop()
 
         print 'MATS up and running. Waiting until Firefox/Nightly to stops.'
-        
+    
+    def wait_for_stop(self):
+        self.FirefoxThread.join()
+        print 'Stopping controller'
+        self.controller.stop()
+        self.controller.join()
+        print 'MATS runner finishes.'
+    
     def stop(self):
         self.FirefoxThread.stop()
         self.FirefoxThread.join()

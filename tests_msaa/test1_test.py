@@ -2,14 +2,21 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this file,
 # You can obtain one at http://mozilla.org/MPL/2.0/.
 
+import sys
+sys.path.append('../')
+
 from mats_runner import MatsRunner
+import unittest
+from time import sleep
+import os
 
 class A11yTest1(unittest.TestCase):
     def setUp(self):
-        self.runner = MatsRunner(config = 'winconfig.ini', webpage = 'file://./pages/test1.html')
+        self.runner = MatsRunner(config_file = '../winconfig.ini', url = 'file://' + os.path.join(os.getcwd(), 'pages', 'test1.html'))
+        self.runner.start()
         
     def test_whatever(self):
-        self.marionette.navigate('file://./tests/test1.html')
+        pass
         
     def tearDown(self):
         self.runner.stop()

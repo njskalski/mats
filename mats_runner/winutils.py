@@ -2,7 +2,10 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this file,
 # You can obtain one at http://mozilla.org/MPL/2.0/.
 
+#http://forums.codeguru.com/showthread.php?t=392273 - usefull 
+
 import win32gui
+import win32process
 import ctypes
 import ctypes.wintypes
 import comtypes
@@ -10,7 +13,7 @@ import comtypes.client
 import winconstants
 from time import sleep
 
-from threading import Thread, Event
+from threading import Thread, Event, Lock
 
 class NightlyWindowNotFoundException(Exception):
     pass
@@ -34,9 +37,8 @@ class ListenerThread(Thread):
         self._activeEvent = Event()
         self.hwnd = hwnd
         self.pid = pid
-        #self.processId = getProcessFromHwnd(self.hwnd)
-        
-        Listener = self
+        self._tmpQueue = []
+        self._tmpQueueLock = Lock()
         
         #http://msdn.microsoft.com/en-us/library/windows/desktop/aa383751%28v=vs.85%29.aspx
         self.callback_function_prototype = ctypes.WINFUNCTYPE(
@@ -87,10 +89,20 @@ class ListenerThread(Thread):
         self._activeEvent.clear()   #shutting down the loop
         self.join(20)               #waiting ListenerThread to finish
         print 'Listener stopped'
+        
+    def put_event_in_tmp_queue(self, event):
+        '''
+        Blocking functions to be called from external threads.
+        Puts events in temporary queue.
+        '''
+        
+        with self._tmpQueueLock:
+            self._tmpQueue.append(event)
+            
     
 #http://msdn.microsoft.com/en-us/library/windows/desktop/dd373885%28v=vs.85%29.aspx    
 def WinEventProc(hWinEventHook, event, hwnd, idObject, idChild, dwEventThread, dwmsEventTime):
-    pass
+    ListenerThread._singleInstance.put_event_in_tmp_queue( (event, hwnd, idObject, idChild, dwEventThread, dwmsEventTime) )
 #    if event in winconstants.eventIntToName.keys():
 #        print winconstants.eventIntToName[event],
 #    
@@ -123,8 +135,20 @@ def getWindowsByName(name):
     win32gui.EnumWindows(getWindowCallback, result)
     return result
 
-def getProcessFromHwnd(hwnd):
-    return ctypes.oledll.oleacc.GetProcessHandleFromHwnd(hwnd)
+def getWindowsByPID(PID):
+    result = []
+    def getWindowCallback(hwnd, res):
+        tmpPID = getPIDFromHWND(hwnd)
+        title = win32gui.GetWindowText(hwnd)
+        if tmpPID == PID:
+            if 'Nightly' in title:
+                res.append( (hwnd, title) )
+    win32gui.EnumWindows(getWindowCallback, result)
+    return result
+
+def getPIDFromHWND(hwnd):
+    TId, PId = win32process.GetWindowThreadProcessId(hwnd)
+    return PId
 
 def getNightlies():
     nightlies = getWindowsByName('Nightly') 

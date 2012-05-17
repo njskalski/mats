@@ -22,7 +22,7 @@ print 'Using config file: ' + args[0].config
 runner = MatsRunner(args[0].config)
 try:
     runner.start()
-    runner.join()
+    runner.wait_for_stop()
     print 'bye!'
 #except KeyboardInterrupt:
 #    runner.stop()
