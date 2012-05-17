@@ -44,14 +44,12 @@ class MatsMsaaController(MatsBaseController):
         
         starttime = datetime.datetime.now()
         while datetime.datetime.now() - starttime < datetime.timedelta(seconds=timeout):
-            print '..',
             try:
                 Nightlies = winutils.getNightlies()
             except winutils.NightlyWindowNotFoundException as ne:
                 pass
-            sleep(3)
+            sleep(6)
         
-            
         if len(Nightlies) > 1:
             print 'WARNING: more than one instance of Nightly found, using first one.'
         return Nightlies[0][0]

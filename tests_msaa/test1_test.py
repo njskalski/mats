@@ -2,13 +2,14 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this file,
 # You can obtain one at http://mozilla.org/MPL/2.0/.
 
+from mats_runner import MatsRunner
 
-class BasicA11yTester(unittest.TestCase):
+class A11yTest1(unittest.TestCase):
     def setUp(self):
-        self.runner = MatsRunner(webpage = 'file://./pages/test1.html')
+        self.runner = MatsRunner(config = 'winconfig.ini', webpage = 'file://./pages/test1.html')
         
     def test_whatever(self):
-        pass
+        self.marionette.navigate('file://./tests/test1.html')
         
     def tearDown(self):
         self.runner.stop()
