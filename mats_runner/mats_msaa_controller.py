@@ -25,12 +25,25 @@ class MatsMsaaController(MatsBaseController):
         print 'Accessible object is: ' + str(self.AccessibleObject)
         
         #starting listener
-        self.listenerThread = winutils.ListenerThread(hwnd = self.hwnd, pid = self.pid)
+        self.listenerThread = winutils.ListenerThread(controller = self, hwnd = self.hwnd, pid = self.pid)
         self.listenerThread.start()
         self.listenerThread.wait_for_ready()
         self._ready.set()
         self.listenerThread.join()
         
+    def register_listener_to_event(self, event_string, callable):
+        pass
+        
+    def deregister_listener_to_event(self, event_string, callable):
+        pass
+    
+    def _inject_events(self, events):
+        '''
+        method to be called solely by ListenerThread from winutils
+        '''
+        pass
+        
+    
     def wait_for_ready(self, timeout = None):
         self._ready.wait(timeout)
     

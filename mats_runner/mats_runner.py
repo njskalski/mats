@@ -84,3 +84,11 @@ class MatsRunner(object):
         self.controller.join()
         print 'MATS runner finishes.'
         
+        
+    def wait_for_event(self, event_string, timeout = 60):
+        '''
+        this method is the easiest interface to wait for an event.
+        TODO: abstract it to cross-platform
+        '''
+        
+        pass

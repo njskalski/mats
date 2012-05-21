@@ -31,14 +31,17 @@ class ListenerThread(Thread):
                                 cls, *args, **kwargs)
         return cls._singleInstance
     
-    def __init__(self, hwnd, pid):
+    def __init__(self, controller, hwnd, pid):
         Thread.__init__(self)
         
+        self.controller = controller
         self._activeEvent = Event()
         self.hwnd = hwnd
         self.pid = pid
         self._tmpQueue = []
         self._tmpQueueLock = Lock()
+        self._listeners = {}
+        self._listenersLock = Lock()
         
         #http://msdn.microsoft.com/en-us/library/windows/desktop/aa383751%28v=vs.85%29.aspx
         self.callback_function_prototype = ctypes.WINFUNCTYPE(
@@ -74,6 +77,7 @@ class ListenerThread(Thread):
         self._activeEvent.set()
         while self._activeEvent.is_set():
             win32gui.PumpWaitingMessages() #TODO rethink that
+            self._send_events_to_controller()
             sleep(1)
     
         unhook_result = ctypes.windll.user32.UnhookWinEvent(self.callback_function_hook)
@@ -98,6 +102,13 @@ class ListenerThread(Thread):
         
         with self._tmpQueueLock:
             self._tmpQueue.append(event)
+            
+    def _send_events_to_controller(self):
+        with self._tmpQueueLock:
+            events = self._tmpQueue
+            self._tmpQueue = []
+        
+        self.controller._inject_events(events)
             
     
 #http://msdn.microsoft.com/en-us/library/windows/desktop/dd373885%28v=vs.85%29.aspx    
