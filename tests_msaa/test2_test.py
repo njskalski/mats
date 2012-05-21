@@ -17,12 +17,7 @@ class A11yTest1(unittest.TestCase):
         self.runner.start()
         
     def test_whatever(self):
-        #pyshell.runShellHere({'runner' : self.runner})
-        
-        button = self.runner.marionette.find_element(method = 'id', target = 'button1')
-        self.assertTrue(
-            self.runner.wait_for_event('EVENT_OBJECT_FOCUS', button.click, timeout = 10)
-            )
+        pyshell.runShellHere({'runner' : self.runner})
         
     def tearDown(self):
         self.runner.stop()

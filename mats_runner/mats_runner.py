@@ -88,9 +88,15 @@ class MatsRunner(object):
         print 'MATS runner finishes.'
         
         
-    def wait_for_event(self, event_string, timeout = 60):
+    def wait_for_event(self, event_string, callable, timeout = 60):
         '''
         this method is the easiest interface to wait for an event.
+        First, it registers listener.
+        Second, it calls callable (TODO: add arguments)
+        Third, it waits for the event or timeouts
+        
+        it returns True if the event was captured, and False if timeout occured
+        
         TODO: abstract it to cross-platform
         '''
         
@@ -101,6 +107,11 @@ class MatsRunner(object):
             arrived.set()
             
         self.controller.register_event_listener(event_string, callback)
+        
+        #TODO next two lines should be 'atomic' towards event pump. NEEDS URGENT FIX
+        callable()
         result = arrived.wait(timeout)
+        
+        
         self.controller.deregister_event_listener(event_string, callback)
         return result

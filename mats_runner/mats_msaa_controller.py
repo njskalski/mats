@@ -23,7 +23,7 @@ class MatsMsaaController(MatsBaseController):
     def run(self):
         print 'Controller is waiting for window (HWND) to appear'
         self.hwnd = self.wait_and_get_firefox_hwnd_from_pid()
-        print 'Controller got the HWND'
+        print 'Controller got the HWND, and it is ' + str(self.hwnd)
         
         #just some shortcuts
         self.IAccessible = winutils.loadIAccessible()
