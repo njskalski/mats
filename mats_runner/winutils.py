@@ -113,14 +113,14 @@ class ListenerThread(Thread):
             
     
 #http://msdn.microsoft.com/en-us/library/windows/desktop/dd373885%28v=vs.85%29.aspx    
-def WinEventProc(hWinEventHook, event, hwnd, idObject, idChild, dwEventThread, dwmsEventTime):
+def WinEventProc(_hWinEventHook, _event, _hwnd, _idObject, _idChild, _dwEventThread, _dwmsEventTime):
     ListenerThread._singleInstance.put_event_in_tmp_queue(event.Event(
-                                                            id = event,
-                                                            hwnd = hwnd,
-                                                            idObject = idObject,
-                                                            idChild = idChild,
-                                                            dwEventThread = dwEventThread,
-                                                            dwmsEventTime = dwmsEventTime
+                                                            id = _event,
+                                                            hwnd = _hwnd,
+                                                            idObject = _idObject,
+                                                            idChild = _idChild,
+                                                            dwEventThread = _dwEventThread,
+                                                            dwmsEventTime = _dwmsEventTime
                                                                       ))                                                          
 
 def loadIAccessible():

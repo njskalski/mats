@@ -37,12 +37,11 @@ class MatsMsaaController(MatsBaseController):
         self.listenerThread.wait_for_ready()
         self._active.set()
         
-        while self._active:
+        while self._active.is_set():
             self._dispatch_events()
             sleep(1)
         
-        
-        self.listenerThread.join()
+        self.listenerThread.stop()
         
     def register_listener_to_event(self, event_string, callable):
         pass
@@ -56,7 +55,7 @@ class MatsMsaaController(MatsBaseController):
         '''
         if len(events) > 0:
             with self._eventQueueLock:
-                self._eventQueue.append(evets)
+                self._eventQueue.append(events)
             
     def _dispatch_events(self):
         with self._eventQueueLock:
@@ -69,9 +68,13 @@ class MatsMsaaController(MatsBaseController):
         self._active.wait(timeout)
     
     def stop(self):
-        #TODO check that 
-        self.listenerThread.stop()
+        '''
+        To be called by external thread. Stops Controller and sub-threads.
+        '''
+        
         self._active.clear()
+        self.join()
+        print 'boo'
     
     def wait_and_get_firefox_hwnd_from_pid(self, timeout = 60):
         '''

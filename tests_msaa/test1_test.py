@@ -13,8 +13,7 @@ from mats_runner import winconstants
 
 class A11yTest1(unittest.TestCase):
     def setUp(self):
-        url = 'file://./tests/test1.html'
-        self.runner = MatsRunner(config_file = '../winconfig.ini', url = url)# = 'file://' + os.path.join(os.getcwd(), 'pages', 'test1.html'))
+        self.runner = MatsRunner(config_file = '../winconfig.ini', url = 'file://' + os.path.join(os.getcwd(), 'pages', 'test1.html'))
         self.runner.start()
         
     def test_whatever(self):
