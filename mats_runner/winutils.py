@@ -12,6 +12,7 @@ import comtypes
 import comtypes.client
 import winconstants
 from time import sleep
+import event
 
 from threading import Thread, Event, Lock
 
@@ -113,7 +114,14 @@ class ListenerThread(Thread):
     
 #http://msdn.microsoft.com/en-us/library/windows/desktop/dd373885%28v=vs.85%29.aspx    
 def WinEventProc(hWinEventHook, event, hwnd, idObject, idChild, dwEventThread, dwmsEventTime):
-    ListenerThread._singleInstance.put_event_in_tmp_queue( (event, hwnd, idObject, idChild, dwEventThread, dwmsEventTime) )
+    ListenerThread._singleInstance.put_event_in_tmp_queue(event.Event(
+                                                            id = event,
+                                                            hwnd = hwnd,
+                                                            idObject = idObject,
+                                                            idChild = idChild,
+                                                            dwEventThread = dwEventThread,
+                                                            dwmsEventTime = dwmsEventTime
+                                                                      ))                                                          
 
 def loadIAccessible():
     '''

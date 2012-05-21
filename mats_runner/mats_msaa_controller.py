@@ -6,12 +6,19 @@ from mats_base_controller import MatsBaseController
 import winutils
 import datetime
 from time import sleep
-from threading import Event
+from threading import Event, Lock
+
+from collections import defaultdict
 
 class MatsMsaaController(MatsBaseController):
     def __init__(self, pid):
         MatsBaseController.__init__(self, pid)
-        self._ready = Event()
+        self._active = Event()
+        
+        self._eventQueue = []
+        self._eventQueueLock = Lock()
+        
+        self.listeners = defaultdict(list) # event_id -> [callables]
         
     def run(self):
         print 'Controller is waiting for window (HWND) to appear'
@@ -28,7 +35,13 @@ class MatsMsaaController(MatsBaseController):
         self.listenerThread = winutils.ListenerThread(controller = self, hwnd = self.hwnd, pid = self.pid)
         self.listenerThread.start()
         self.listenerThread.wait_for_ready()
-        self._ready.set()
+        self._active.set()
+        
+        while self._active:
+            self._dispatch_events()
+            sleep(1)
+        
+        
         self.listenerThread.join()
         
     def register_listener_to_event(self, event_string, callable):
@@ -41,14 +54,24 @@ class MatsMsaaController(MatsBaseController):
         '''
         method to be called solely by ListenerThread from winutils
         '''
-        pass
-        
+        if len(events) > 0:
+            with self._eventQueueLock:
+                self._eventQueue.append(evets)
+            
+    def _dispatch_events(self):
+        with self._eventQueueLock:
+            for pack in self._eventQueue:
+                for event in pack:
+                    for callable in self.listeners[event.get_id()]:
+                        callable(event)
     
     def wait_for_ready(self, timeout = None):
-        self._ready.wait(timeout)
+        self._active.wait(timeout)
     
     def stop(self):
+        #TODO check that 
         self.listenerThread.stop()
+        self._active.clear()
     
     def wait_and_get_firefox_hwnd_from_pid(self, timeout = 60):
         '''
