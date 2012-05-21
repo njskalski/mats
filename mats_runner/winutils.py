@@ -135,12 +135,12 @@ def getWindowsByName(name):
     win32gui.EnumWindows(getWindowCallback, result)
     return result
 
-def getWindowsByPID(PID):
+def getNightliesByPID(PID):
     result = []
     def getWindowCallback(hwnd, res):
         tmpPID = getPIDFromHWND(hwnd)
-        title = win32gui.GetWindowText(hwnd)
         if tmpPID == PID:
+            title = win32gui.GetWindowText(hwnd)
             if 'Nightly' in title:
                 res.append( (hwnd, title) )
     win32gui.EnumWindows(getWindowCallback, result)
