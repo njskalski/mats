@@ -103,19 +103,6 @@ class ListenerThread(Thread):
 #http://msdn.microsoft.com/en-us/library/windows/desktop/dd373885%28v=vs.85%29.aspx    
 def WinEventProc(hWinEventHook, event, hwnd, idObject, idChild, dwEventThread, dwmsEventTime):
     ListenerThread._singleInstance.put_event_in_tmp_queue( (event, hwnd, idObject, idChild, dwEventThread, dwmsEventTime) )
-#    if event in winconstants.eventIntToName.keys():
-#        print winconstants.eventIntToName[event],
-#    
-#        if hwnd == ListenerThread._singleInstance.hwnd:
-#            print '\t\t (HWND match)',
-#        
-#        print '\n'
-#        return
-#    
-#    if hwnd == ListenerThread._singleInstance.hwnd:
-#        print 'unknown event, but HWND matches'
-    
-    
 
 def loadIAccessible():
     '''
@@ -125,15 +112,6 @@ def loadIAccessible():
     '''
     comtypes.client.GetModule('oleacc.dll')
     return comtypes.gen.Accessibility.IAccessible
-
-def getWindowsByName(name):
-    result = []
-    def getWindowCallback(hwnd, res):
-        title = win32gui.GetWindowText(hwnd)
-        if name in title:
-            res.append( (hwnd, title) )
-    win32gui.EnumWindows(getWindowCallback, result)
-    return result
 
 def getNightliesByPID(PID):
     result = []
@@ -149,13 +127,6 @@ def getNightliesByPID(PID):
 def getPIDFromHWND(hwnd):
     TId, PId = win32process.GetWindowThreadProcessId(hwnd)
     return PId
-
-def getNightlies():
-    nightlies = getWindowsByName('Nightly') 
-    if len(nightlies) > 0:
-        return nightlies
-    else: 
-        raise NightlyWindowNotFoundException("Nightly window not found")
 
 def getAccessibleObjectFromWindow(hwnd):
     ptr = ctypes.POINTER(comtypes.gen.Accessibility.IAccessible)()

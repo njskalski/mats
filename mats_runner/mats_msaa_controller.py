@@ -36,25 +36,6 @@ class MatsMsaaController(MatsBaseController):
     
     def stop(self):
         self.listenerThread.stop()
-
-    def wait_and_get_firefox_hwnd(self, timeout = 60):
-        '''
-        This method blocks controller thread until Firefox/Nightly window HWND is available.
-        TODO : this method sucks, but I really need it in order for MATS to be
-        reliable. Fix active waiting with something civilized. 
-        '''
-        
-        starttime = datetime.datetime.now()
-        while datetime.datetime.now() - starttime < datetime.timedelta(seconds=timeout):
-            try:
-                Nightlies = winutils.getNightlies()
-            except winutils.NightlyWindowNotFoundException as ne:
-                pass
-            sleep(1)
-        
-        if len(Nightlies) > 1:
-            print 'WARNING: more than one instance of Nightly found, using first one.'
-        return Nightlies[0][0]
     
     def wait_and_get_firefox_hwnd_from_pid(self, timeout = 60):
         '''
