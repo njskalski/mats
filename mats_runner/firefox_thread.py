@@ -34,7 +34,10 @@ class FirefoxThread(Thread):
         
         self.profile = FirefoxProfile()
         self.profile.set_preferences({"marionette.defaultPrefs.enabled" : True,
-                                      "marionette.defaultPrefs.port": 2828})
+                                      "marionette.defaultPrefs.port": 2828,
+                                      "browser.startup.page": 0,
+                                      "browser.startup.homepage": "about:blank",
+                                      })
         self.runner = FirefoxRunner(profile = self.profile,
                                     binary = self.binary,
                                     kp_kwargs = {'processOutputLine' : [self.logger]})

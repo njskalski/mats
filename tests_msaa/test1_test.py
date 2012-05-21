@@ -5,7 +5,7 @@
 import sys
 sys.path.append('../')
 
-from mats_runner import MatsRunner
+from mats_runner import MatsRunner, pyshell 
 import unittest
 from time import sleep
 import os
@@ -17,9 +17,11 @@ class A11yTest1(unittest.TestCase):
         self.runner.start()
         
     def test_whatever(self):
-        button = self.runner.marionette.find_element(method = 'id', target = 'button1')
-        button.click()
-        self.runner.wait_for_event('EVENT_OBJECT_FOCUS')
+        pyshell.runShellHere({'runner' : self.runner})
+        
+        #button = self.runner.marionette.find_element(method = 'id', target = 'button1')
+        #button.click()
+        #self.runner.wait_for_event('EVENT_OBJECT_FOCUS')
         pass
         
     def tearDown(self):

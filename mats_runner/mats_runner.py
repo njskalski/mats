@@ -13,6 +13,8 @@ from time import sleep
 from pyshell import *
 from winutils import *
 
+import threading
+
 class MatsRunner(object):
     def __init__(self, config_file = 'config.ini', url = 'about:blank'):
         self.config_file = config_file
@@ -58,7 +60,8 @@ class MatsRunner(object):
             self.marionette = Marionette('localhost', self.marionette_port)
             #TODO: move starting session and navigation to separate methods
             print 'Starting session'
-            self.marionette.start_session()
+            sleep(5) #TODO temporary workaround for https://bugzilla.mozilla.org/show_bug.cgi?id=757078
+            self.marionette_session = self.marionette.start_session()
             print 'Navigating to ' + self.url
             print self.marionette.navigate(self.url)
         except Exception as e:
@@ -91,4 +94,13 @@ class MatsRunner(object):
         TODO: abstract it to cross-platform
         '''
         
-        pass
+        arrived = threading.Event()
+        
+        def callback(event):
+            print 'got event! ' + str(event)
+            arrived.set()
+            
+        self.controller.register_event_listener(event_string, callback)
+        result = arrived.wait(timeout)
+        self.controller.deregister_event_listener(event_string, callback)
+        return result

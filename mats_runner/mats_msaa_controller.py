@@ -4,9 +4,10 @@
 
 from mats_base_controller import MatsBaseController
 import winutils
+import winconstants
 import datetime
 from time import sleep
-from threading import Event, Lock
+from threading import Event, Lock, Condition
 
 from collections import defaultdict
 
@@ -16,9 +17,8 @@ class MatsMsaaController(MatsBaseController):
         self._active = Event()
         
         self._eventQueue = []
-        self._eventQueueLock = Lock()
-        
-        self.listeners = defaultdict(list) # event_id -> [callables]
+        self._eventQueueLock = Lock() #this locks now both _eventQueue and _listeners TODO: add another lock, and do proof of correctness
+        self._listeners = defaultdict(set) # event_id -> [callables]
         
     def run(self):
         print 'Controller is waiting for window (HWND) to appear'
@@ -39,15 +39,21 @@ class MatsMsaaController(MatsBaseController):
         
         while self._active.is_set():
             self._dispatch_events()
-            sleep(1)
+            sleep(1) #TODO change this to condition, since there is no point of looping until new messages arrive
         
         self.listenerThread.stop()
         
-    def register_listener_to_event(self, event_string, callable):
-        pass
+    def register_event_listener(self, event_string, callable):
+        with self._eventQueueLock:
+            self._listeners[winconstants.eventNameToInt[event_string]].add(callable)
         
-    def deregister_listener_to_event(self, event_string, callable):
-        pass
+    def deregister_event_listener(self, event_string, callable):
+        with self._eventQueueLock:
+            self._listeners[winconstants.eventNameToInt[event_string]].remove(callable)
+            
+    def clear_event_queue(self):
+        with self._eventQueueLock:
+            self._eventQueue = []
     
     def _inject_events(self, events):
         '''
@@ -61,7 +67,7 @@ class MatsMsaaController(MatsBaseController):
         with self._eventQueueLock:
             for pack in self._eventQueue:
                 for event in pack:
-                    for callable in self.listeners[event.get_id()]:
+                    for callable in self._listeners[event.get_id()]:
                         callable(event)
     
     def wait_for_ready(self, timeout = None):
@@ -74,7 +80,6 @@ class MatsMsaaController(MatsBaseController):
         
         self._active.clear()
         self.join()
-        print 'boo'
     
     def wait_and_get_firefox_hwnd_from_pid(self, timeout = 60):
         '''
