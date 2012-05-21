@@ -18,8 +18,8 @@ class A11yTest1(unittest.TestCase):
         self.runner.start()
         
     def test_whatever(self):
-        button = self.runner.marionette.find_element(method = 'id', target = 'button1')
-        button.click()
+        #button = self.runner.marionette.find_element(method = 'id', target = 'button1')
+        #button.click()
         #self.runner.wait_for_event('EVENT_OBJECT_FOCUS')
         pass
         
