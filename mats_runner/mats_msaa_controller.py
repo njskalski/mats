@@ -5,6 +5,9 @@
 from mats_base_controller import MatsBaseController
 import winutils
 import winconstants
+
+from windows_listener import WindowsListener
+
 import datetime
 from time import sleep
 from threading import Event, Lock, Condition
@@ -35,7 +38,7 @@ class MatsMsaaController(MatsBaseController):
         print 'Accessible object is: ' + str(self.AccessibleObject)
         
         #starting listener
-        self.listener = winutils.WindowsListener(controller = self, hwnd = self.hwnd, pid = self.pid)
+        self.listener = WindowsListener(hwnd = self.hwnd, pid = self.pid)
         self.listener.start()
         
         self._ready.set()
