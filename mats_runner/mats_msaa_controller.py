@@ -42,6 +42,11 @@ class MatsMsaaController(MatsBaseController):
             sleep(1) #TODO change this to condition, since there is no point of looping until new messages arrive
         
         self.listenerThread.stop()
+
+    def start_event_loop(self):
+        pass
+    def stop_event_loop(self):
+        pass
         
     def register_event_listener(self, event_string, callable):
         with self._eventQueueLock:
