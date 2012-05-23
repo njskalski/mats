@@ -18,6 +18,8 @@ class A11yTest1(unittest.TestCase):
         
     def test_whatever(self):
         
+        self.assertEqual(True,self.runner.instantiate_a11y())
+
         button = self.runner.marionette.find_element(method = 'id', target = 'button1')
         
         self.assertTrue(
