@@ -86,7 +86,53 @@ class MatsRunner(object):
         self.controller.stop()
         self.controller.join()
         print 'MATS runner finishes.'
+    
+    def instantiate_a11y(self):
+        '''
+        runs via marionette script taken from 
+        http://dxr.lanedo.com/search.cgi?tree=mozilla-central&string=nsIAccessibleApplication
         
+        sets context to content after doing it's stuff
+        '''
+        
+        script = \
+'''
+const nsIAccessibleRetrieval = Components.interfaces.nsIAccessibleRetrieval;
+const nsIAccessibleApplication = Components.interfaces.nsIAccessibleApplication;
+
+var gAccRetrieval = Components.classes["@mozilla.org/accessibleRetrieval;1"].
+  getService(nsIAccessibleRetrieval);
+app = gAccRetrieval.getApplicationAccessible().
+    QueryInterface(nsIAccessibleApplication);
+    
+return app != null;
+'''
+        self.marionette.set_context("chrome")
+        notNull = self.marionette.execute_script(script)
+        #self.marionette.set_context("content")
+        return notNull
+    
+    def is_a11y_instantiated(self):
+        '''
+        to do doc
+        '''
+        
+        script = \
+'''
+    var enabled = false;
+    return enabled;
+    try {
+        enabled = components.manager.QueryInterface(Ci.nsIServiceManager)
+                    .isServiceInstantiatedByContractID(
+                    "@mozilla.org/accessibilityService;1",
+                    Ci.nsISupports);
+    } catch (ex) {
+        enabled = false;
+    }
+    return enabled;
+'''
+        return self.marionette.execute_script(script)
+    
     def wait_for_event(self, event_string, callable, timeout = 60):
         '''
         this method is the easiest interface to wait for an event.
