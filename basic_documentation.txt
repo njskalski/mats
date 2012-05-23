@@ -3,22 +3,13 @@ There are (unfortunately) multiple threads in this project. Fortunately, they fo
 call tree - each thread is constructed and destroyed by the same owner thread,
 and ownership presents as follows:
 
-MatsRunner
+MatsRunner - this is not a thread
 	FirefoxThread
 		(embeds Mozprocess stuff)
 	MatsController
-		system specific EventListener
+		system specific event listner, which is not necessarly a process
 		
 each thread exposes (along with obvious start() method) methods:
 stop() - stops the thread, should be called only by thread owner
 wait_for_ready() - waits until entry protocol of run() is finished, and thread object is
 	ready to receive further commands
-
-
-MatsRunner is a thread. It's life cycle is as follows:
-
-1) it reads config file and asserts it's correct
-2) it creates FirefoxThread, which wraps MozRunner
-3) it waits for FirefoxThread to provide Firefox's PID, which is necessary for 4
-4) it creates a system-specific Controller, which is a thread, and feeds it with FF's PID
-5) ... tbd later
