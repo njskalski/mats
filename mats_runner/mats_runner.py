@@ -91,6 +91,7 @@ class MatsRunner(object):
         '''
         runs via marionette script taken from 
         http://dxr.lanedo.com/search.cgi?tree=mozilla-central&string=nsIAccessibleApplication
+        to force A11y engine instantiation.
         
         sets context to content after doing it's stuff
         '''
@@ -105,33 +106,35 @@ var gAccRetrieval = Components.classes["@mozilla.org/accessibleRetrieval;1"].
 app = gAccRetrieval.getApplicationAccessible().
     QueryInterface(nsIAccessibleApplication);
     
-return app != null;
+return (app) ? true : false;
 '''
         self.marionette.set_context("chrome")
         notNull = self.marionette.execute_script(script)
-        #self.marionette.set_context("content")
+        self.marionette.set_context("content")
         return notNull
     
     def is_a11y_instantiated(self):
         '''
-        to do doc
+        runs via marionette script that checks if A11y engine is instantiated.
+        and returns true if so.
+        
+        sets context to content after doing it's stuff
         '''
         
         script = \
 '''
-    var enabled = false;
-    return enabled;
-    try {
-        enabled = components.manager.QueryInterface(Ci.nsIServiceManager)
+        var enabled;
+        enabled = Components.manager.QueryInterface(Ci.nsIServiceManager)
                     .isServiceInstantiatedByContractID(
                     "@mozilla.org/accessibilityService;1",
                     Ci.nsISupports);
-    } catch (ex) {
-        enabled = false;
-    }
-    return enabled;
+
+        return enabled;
 '''
-        return self.marionette.execute_script(script)
+        self.marionette.set_context('chrome')
+        result = self.marionette.execute_script(script)
+        self.marionette.set_context('content') 
+        return result
     
     def wait_for_event(self, event_string, callable, timeout = 60):
         '''
