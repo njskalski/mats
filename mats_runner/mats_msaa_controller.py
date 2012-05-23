@@ -14,11 +14,14 @@ from collections import defaultdict
 class MatsMsaaController(MatsBaseController):
     def __init__(self, pid):
         MatsBaseController.__init__(self, pid)
-        self._active = Event()
         
-        self._eventQueue = []
-        self._eventQueueLock = Lock() #this locks now both _eventQueue and _listeners TODO: add another lock, and do proof of correctness
-        self._listeners = defaultdict(set) # event_id -> [callables]
+        self._ready = Event()
+        self._listeners = defaultdict(set) # event_id -> set(callables)
+        
+        #main loop controls:
+        self._stateCondition = Condition()
+        self._stateActive = True
+        self._statePaused = True
         
     def run(self):
         print 'Controller is waiting for window (HWND) to appear'
@@ -32,59 +35,83 @@ class MatsMsaaController(MatsBaseController):
         print 'Accessible object is: ' + str(self.AccessibleObject)
         
         #starting listener
-        self.listenerThread = winutils.ListenerThread(controller = self, hwnd = self.hwnd, pid = self.pid)
-        self.listenerThread.start()
-        self.listenerThread.wait_for_ready()
-        self._active.set()
+        self.listener = winutils.WindowsListener(controller = self, hwnd = self.hwnd, pid = self.pid)
+        self.listener.start()
         
-        while self._active.is_set():
-            self._dispatch_events()
-            sleep(1) #TODO change this to condition, since there is no point of looping until new messages arrive
+        self._ready.set()
         
-        self.listenerThread.stop()
+        self._stateCondition.acquire()
+        while True:
+            if self._stateActive:
+                if self._statePaused == False:
+                    self.listener.pump_messages() #TODO if function returns *always after all* messages are handled by WinProc, we can remove underlying lock to improve performance
+                    messages = self.listener.get_queued_events()
+                    self._process_messages(messages)
+                    self._stateCondition.release()
+                    sleep(1) #TODO here should be passive waiting
+                    self._stateCondition.acquire()
+                else:
+                    self._stateCondition.wait()
+                    continue
+            else:
+                self._stateCondition.release()
+                break
+                 
+        self.listener.stop()
 
-    def start_event_loop(self):
-        pass
-    def stop_event_loop(self):
-        pass
+    def unpause_event_loop(self):
+        self._stateCondition.acquire()
+        self._statePaused = False
+        self._stateCondition.notify()
+        self._stateCondition.release()
+        
+    def pause_event_loop(self):
+        self._stateCondition.acquire()
+        self._statePaused = True
+        self._stateCondition.notify()
+        self._stateCondition.release()
+        
+
+    def stop(self):
+        '''
+        To be called by external thread. Stops Controller thread.
+        '''
+        self._stateCondition.acquire()
+        self._stateActive = False
+        self._stateCondition.notify()
+        self._stateCondition.release()
+        
+        self.join()
+
         
     def register_event_listener(self, event_string, callable):
-        with self._eventQueueLock:
+        with self._stateCondition:
             self._listeners[winconstants.eventNameToInt[event_string]].add(callable)
         
     def deregister_event_listener(self, event_string, callable):
-        with self._eventQueueLock:
+        with self._stateCondition:
             self._listeners[winconstants.eventNameToInt[event_string]].remove(callable)
+
+    def _process_messages(self, messages):
+        '''
+        while here, stateConditionLock is acquired!
+        '''
+        for pack in self._eventQueue:
+            for event in pack:
+                for callable in self._listeners[event.get_id()]:
+                        callable(event)
             
     def clear_event_queue(self):
         with self._eventQueueLock:
             self._eventQueue = []
     
     def _inject_events(self, events):
-        '''
-        method to be called solely by ListenerThread from winutils
-        '''
         if len(events) > 0:
             with self._eventQueueLock:
                 self._eventQueue.append(events)
-            
-    def _dispatch_events(self):
-        with self._eventQueueLock:
-            for pack in self._eventQueue:
-                for event in pack:
-                    for callable in self._listeners[event.get_id()]:
-                        callable(event)
     
     def wait_for_ready(self, timeout = None):
-        self._active.wait(timeout)
-    
-    def stop(self):
-        '''
-        To be called by external thread. Stops Controller and sub-threads.
-        '''
-        
-        self._active.clear()
-        self.join()
+        self._ready.wait(timeout)
     
     def wait_and_get_firefox_hwnd_from_pid(self, timeout = 60):
         '''
