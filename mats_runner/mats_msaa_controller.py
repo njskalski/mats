@@ -15,6 +15,7 @@ from threading import Event, Lock, Condition
 from collections import defaultdict
 
 class MatsMsaaController(MatsBaseController):
+    
     def __init__(self, pid):
         MatsBaseController.__init__(self, pid)
         
@@ -43,6 +44,8 @@ class MatsMsaaController(MatsBaseController):
         
         self._ready.set()
         
+        print 'Listener is ready, call unpause_event_loop() to start pumping messages'
+        
         self._stateCondition.acquire()
         while True:
             if self._stateActive:
@@ -63,14 +66,28 @@ class MatsMsaaController(MatsBaseController):
         self.listener.stop()
 
     def unpause_event_loop(self):
+        '''
+        starts event loop
+        '''
+        
         self._stateCondition.acquire()
-        self._statePaused = False
+        if self._statePaused:
+            self.listener.start()
+            self._statePaused = False
         self._stateCondition.notify()
         self._stateCondition.release()
         
     def pause_event_loop(self):
+        '''
+        pauses event loop, deregisters windows event hook method, cleans event queue
+        '''
+        
         self._stateCondition.acquire()
-        self._statePaused = True
+        if not self._statePaused:
+            self.listener.stop()
+            self.listener.pump_messages()
+            self.listener.get_queued_events()
+            self._statePaused = True
         self._stateCondition.notify()
         self._stateCondition.release()
         
@@ -99,10 +116,9 @@ class MatsMsaaController(MatsBaseController):
         '''
         while here, stateConditionLock is acquired!
         '''
-        for pack in self._eventQueue:
-            for event in pack:
-                for callable in self._listeners[event.get_id()]:
-                        callable(event)
+        for event in messages:
+            for callable in self._listeners[event.get_id()]:
+                callable(event)
             
     def clear_event_queue(self):
         with self._eventQueueLock:
@@ -137,5 +153,5 @@ class MatsMsaaController(MatsBaseController):
             print 'WARNING: more than one instance of Nightly found, using first one.'
             print Nightlies
         return Nightlies[0][0]
-
-    
+                
+        

@@ -87,9 +87,6 @@ class MatsRunner(object):
         self.controller.join()
         print 'MATS runner finishes.'
         
-    
-        
-        
     def wait_for_event(self, event_string, callable, timeout = 60):
         '''
         this method is the easiest interface to wait for an event.
@@ -109,11 +106,13 @@ class MatsRunner(object):
             arrived.set()
             
         self.controller.register_event_listener(event_string, callback)
+        self.controller.unpause_event_loop()
         
-        #TODO next two lines should be 'atomic' towards event pump. NEEDS URGENT FIX
         callable()
+        #TODO next two lines should be 'atomic' towards event pump. NEEDS URGENT FIX
+        
         result = arrived.wait(timeout)
         
-        
+        self.controller.pause_event_loop()
         self.controller.deregister_event_listener(event_string, callback)
         return result
