@@ -46,6 +46,7 @@ class MatsMsaaController(MatsBaseController):
         
         print 'Listener is ready, call unpause_event_loop() to start pumping messages'
         
+        # loop invariant: self._stateCondition is acquired, everywhere except wait() and sleep() lines
         self._stateCondition.acquire()
         while True:
             if self._stateActive:
@@ -60,10 +61,12 @@ class MatsMsaaController(MatsBaseController):
                     self._stateCondition.wait()
                     continue
             else:
-                self._stateCondition.release()
+
                 break
-                 
-        self.listener.stop()
+
+        if self._statePaused == False:
+            self.listener.stop()
+        self._stateCondition.release()
 
     def unpause_event_loop(self):
         '''
