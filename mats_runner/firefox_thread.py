@@ -9,7 +9,6 @@ from threading import Thread, Event
 import datetime, socket, time
 
 from sys import stderr
-from utils import runshellnow
 
 class FirefoxThreadLogger:
     def __init__(self, output):
