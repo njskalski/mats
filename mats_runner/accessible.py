@@ -4,5 +4,9 @@
 
 # this is an abstraction layer representing an Accessible Object, os-independetly
 
-class AccessibleObject(object):
-    pass
+from xml.etree.ElementTree import Element
+
+class AccessibleElement(Element):
+    def __init__(self, name):
+        Element.__init__(self, name)
+    

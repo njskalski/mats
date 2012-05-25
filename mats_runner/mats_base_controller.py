@@ -18,3 +18,6 @@ class MatsBaseController(Thread):
     
     def stop(self):
         raise Exception("Unimplemented method in " + self.__class__.__name__)
+    
+    def getAccessibleTree(self):
+        raise Exception("Unimplemented method in " + self.__class__.__name__)

@@ -70,7 +70,7 @@ class MatsRunner(object):
             self.controller.stop()
             self.FirefoxThread.stop()
 
-        print 'MATS up and running. Waiting until Firefox/Nightly to stops.'
+        print 'MATS up and running. Waiting until Firefox/Nightly stops.'
     
     def wait_for_stop(self):
         self.FirefoxThread.join()
@@ -158,7 +158,6 @@ return (app) ? true : false;
         self.controller.unpause_event_loop()
         
         callable()
-        #TODO next two lines should be 'atomic' towards event pump. NEEDS URGENT FIX
         
         result = arrived.wait(timeout)
         

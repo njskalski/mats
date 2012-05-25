@@ -75,7 +75,7 @@ class WindowsListener(object):
         
     def stop(self):
         unhook_result = ctypes.windll.user32.UnhookWinEvent(self.callback_function_hook)
-        print "Unhooking result: " + str(ctypes.c_bool(unhook_result))
+        print "Unhooking result: " + str(ctypes.c_bool(unhook_result).value)
         
     def pump_messages(self):
         win32gui.PumpWaitingMessages() #TODO rethink that

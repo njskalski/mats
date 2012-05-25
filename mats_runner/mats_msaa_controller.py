@@ -7,7 +7,7 @@ import winutils
 import winconstants
 
 from windows_listener import WindowsListener
-
+from accessible_msaa import getAccessibleElementFromMsaa
 import datetime
 from time import sleep
 from threading import Event, Lock, Condition
@@ -112,7 +112,7 @@ class MatsMsaaController(MatsBaseController):
             self._listeners[winconstants.eventNameToInt[event_string]].add(callable)
         
     def deregister_event_listener(self, event_string, callable):
-        with self._stateCondition:
+        with self._stateConditionAccessibleElement:
             self._listeners[winconstants.eventNameToInt[event_string]].remove(callable)
 
     def _process_messages(self, messages):
@@ -156,5 +156,7 @@ class MatsMsaaController(MatsBaseController):
             print 'WARNING: more than one instance of Nightly found, using first one.'
             print Nightlies
         return Nightlies[0][0]
-                
+    
+    def getAccessibleTree(self):
+        return getAccessibleElementFromMsaa(self.AccessibleObject)
         
