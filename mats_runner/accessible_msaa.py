@@ -17,15 +17,20 @@ import winconstants
 def getAccessibleElementFromMsaa(msaa, IAccessible):
     res = AccessibleElement(getName(msaa))
     
+    #functional programming frenzy!
+    children = [getMsaaChild(msaa, i, IAccessible) for i in range(0, getChildCount(msaa))]
+    res.extend([getAccessibleElementFromMsaa(child) for child in children])
+
+
 def getName(msaa):
     s = BSTR()
     msaa._IAccessible__com__get_accName(winconstants.CHILDID_SELF, byref(s))
     return s.value
     #return msaa.accName()
 
-def getChildrenCount(msaa):
+def getChildCount(msaa):
     num_c = c_long()
-    assert(msaa._IAccessible__com__accChildCount(byref(num_c)) == 0)
+    assert(msaa._IAccessible__com__get_accChildCount(byref(num_c)) == 0)
     return num_c.value
 
 def getMsaaChild(msaa, childnum, IAccessible):
@@ -36,7 +41,6 @@ def getMsaaChild(msaa, childnum, IAccessible):
     msaa._IAccessible__com__get_accChild(childnum, byref(ptr)) #and passing it as **
     
     res = POINTER(IAccessible)()
-    print dir(ptr)
     ptr._IUnknown__com_QueryInterface(byref(IAccessible._iid_), byref(res)) #the only thing worse
     #than dynamic programming, is dynamic programming with windows.
     
