@@ -73,3 +73,4 @@ WINEVENT_INCONTEXT = 0x0004
 # there are two more towards threading here:
 # http://msdn.microsoft.com/en-us/library/windows/desktop/dd373640%28v=vs.85%29.aspx
 
+CHILDID_SELF = 0

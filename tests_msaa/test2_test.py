@@ -21,13 +21,22 @@ class A11yTest1(unittest.TestCase):
     def test_whatever(self):
         
         try:
-            ma.getMsaaChild(self.runner.controller.AccessibleObject, 0 ,self.runner.controller.IAccessible)
+            r = ma.getMsaaChild(self.runner.controller.AccessibleObject, 0 ,self.runner.controller.IAccessible)
+            print ma.getName(r)
         except Exception as e:
             pyshell.falle(e, {'runner' : self.runner,
                               'I' : self.runner.controller.IAccessible,
                               'O' : self.runner.controller.AccessibleObject,
                               'ma' : ma
                               })
+            
+        pyshell.runShellHere({'runner' : self.runner,
+                              'I' : self.runner.controller.IAccessible,
+                              'O' : self.runner.controller.AccessibleObject,
+                              'ma' : ma,
+                              'r' : r
+                              })
+        
         
     def tearDown(self):
         self.runner.stop()

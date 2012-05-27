@@ -10,14 +10,18 @@
 from accessible import AccessibleElement
 
 from ctypes import *
+from comtypes import BSTR
 from comtypes.automation import IDispatch
+import winconstants
 
 def getAccessibleElementFromMsaa(msaa, IAccessible):
     res = AccessibleElement(getName(msaa))
     
 def getName(msaa):
-    #TODO unwrap it to native com call
-    return msaa.accName()
+    s = BSTR()
+    msaa._IAccessible__com__get_accName(winconstants.CHILDID_SELF, byref(s))
+    return s.value
+    #return msaa.accName()
 
 def getChildrenCount(msaa):
     num_c = c_long()
@@ -33,7 +37,7 @@ def getMsaaChild(msaa, childnum, IAccessible):
     
     res = POINTER(IAccessible)()
     print dir(ptr)
-    ptr.__com_QueryInterface(byref(IAccessible._iid_), byref(res)) #the only thing worse
+    ptr._IUnknown__com_QueryInterface(byref(IAccessible._iid_), byref(res)) #the only thing worse
     #than dynamic programming, is dynamic programming with windows.
     
     return res
