@@ -12,7 +12,7 @@ from accessible import AccessibleElement
 from ctypes import *
 from comtypes.automation import IDispatch
 
-def getAccessibleElementFromMsaa(msaa):
+def getAccessibleElementFromMsaa(msaa, IAccessible):
     res = AccessibleElement(getName(msaa))
     
 def getName(msaa):
@@ -24,11 +24,16 @@ def getChildrenCount(msaa):
     assert(msaa._IAccessible__com__accChildCount(byref(num_c)) == 0)
     return num_c.value
 
-def getMsaaChild(msaa, childnum):
+def getMsaaChild(msaa, childnum, IAccessible):
     '''
     I guess there is no difference if childnum is Integer or c_int/c_long here.
     '''
     ptr = POINTER(IDispatch)() #creating null pointer of IDispatch type
-    msaa._IAccessible__com__getChild(childnum, byref(ptr)) #and passing it as **
+    msaa._IAccessible__com__get_accChild(childnum, byref(ptr)) #and passing it as **
     
-    #_IAccessible__com__
+    res = POINTER(IAccessible)()
+    print dir(ptr)
+    ptr.__com_QueryInterface(byref(IAccessible._iid_), byref(res)) #the only thing worse
+    #than dynamic programming, is dynamic programming with windows.
+    
+    return res

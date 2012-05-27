@@ -11,13 +11,23 @@ from time import sleep
 import os
 from mats_runner import winconstants
 
+from mats_runner import accessible_msaa as ma
+
 class A11yTest1(unittest.TestCase):
     def setUp(self):
         self.runner = MatsRunner(config_file = '../winconfig.ini', url = 'file://' + os.path.join(os.getcwd(), 'pages', 'test1.html'))
         self.runner.start()
         
     def test_whatever(self):
-        pyshell.runShellHere({'runner' : self.runner})
+        
+        try:
+            ma.getMsaaChild(self.runner.controller.AccessibleObject, 0 ,self.runner.controller.IAccessible)
+        except Exception as e:
+            pyshell.falle(e, {'runner' : self.runner,
+                              'I' : self.runner.controller.IAccessible,
+                              'O' : self.runner.controller.AccessibleObject,
+                              'ma' : ma
+                              })
         
     def tearDown(self):
         self.runner.stop()
