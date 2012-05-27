@@ -7,6 +7,6 @@
 from xml.etree.ElementTree import Element
 
 class AccessibleElement(Element):
-    def __init__(self, name):
-        Element.__init__(self, name)
+    def __init__(self, attrs):
+        Element.__init__(self, 'accessible', attrs)
     

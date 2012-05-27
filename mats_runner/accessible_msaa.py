@@ -14,22 +14,21 @@ from comtypes import BSTR
 from comtypes.automation import IDispatch, VARIANT, VT_I4
 import winconstants
 
-def getAccessibleElementFromMsaa(msaa, cls):
-    if msaa.__class__ == cls:
-            
-        res = AccessibleElement(getName(msaa))
+def getAccessibleElementFromMsaa(msaa):        
+    res = AccessibleElement({'name': getName(msaa)})
         
-        children = getMsaaChildren(msaa)
-        res.extend([getAccessibleElementFromMsaa(child,cls) for child in children])
-    else:
-        print msaa
-
+    children = getMsaaChildren(msaa)
+    res.extend([getAccessibleElementFromMsaa(child) for child in children])
+        
+    return res
+    
 def getName(msaa):
     s = BSTR()
     variant = VARIANT(c_long(winconstants.CHILDID_SELF),VT_I4)
-    assert(msaa._IAccessible__com__get_accName(variant, byref(s)) == 0)
-    return s.value
-    #return msaa.accName()
+    if msaa._IAccessible__com__get_accName(variant, byref(s)) == 0:
+        return s.value
+    else:
+        return None
 
 def getChildCount(msaa):
     num_c = c_long()
@@ -43,4 +42,5 @@ def getMsaaChildren(msaa):
     oledll.oleacc.AccessibleChildren(msaa, 0, numChildren, array, byref(rescount))
     assert(numChildren == rescount.value)
     
-    return [x.value for x in array]
+    print [x.value for x in array]
+    return []

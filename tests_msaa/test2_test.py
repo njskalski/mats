@@ -21,7 +21,7 @@ class A11yTest1(unittest.TestCase):
     def test_whatever(self):
         
         try:
-            tree = ma.getAccessibleElementFromMsaa(self.runner.controller.AccessibleObject, self.runner.controller.AccessibleObject.__class__)
+            tree = ma.getAccessibleElementFromMsaa(self.runner.controller.AccessibleObject)
             print str(tree)
         except Exception as e:
             pyshell.falle(e, {'runner' : self.runner,
