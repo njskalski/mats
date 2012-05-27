@@ -11,7 +11,7 @@ from accessible import AccessibleElement
 
 from ctypes import *
 from comtypes import BSTR
-from comtypes.automation import IDispatch
+from comtypes.automation import IDispatch, VARIANT, VT_I4
 import winconstants
 
 def getAccessibleElementFromMsaa(msaa, IAccessible):
@@ -24,7 +24,9 @@ def getAccessibleElementFromMsaa(msaa, IAccessible):
 
 def getName(msaa):
     s = BSTR()
-    msaa._IAccessible__com__get_accName(winconstants.CHILDID_SELF, byref(s))
+    variant = VARIANT(c_long(winconstants.CHILDID_SELF),VT_I4)
+    print variant
+    msaa._IAccessible__com__get_accName(variant, byref(s))
     return s.value
     #return msaa.accName()
 
@@ -37,8 +39,12 @@ def getMsaaChild(msaa, childnum, IAccessible):
     '''
     I guess there is no difference if childnum is Integer or c_int/c_long here.
     '''
+    print 'call:',
+    print (msaa, childnum)
+    
+    variant = VARIANT(childnum, VT_I4)
     ptr = POINTER(IDispatch)() #creating null pointer of IDispatch type
-    msaa._IAccessible__com__get_accChild(childnum, byref(ptr)) #and passing it as **
+    msaa._IAccessible__com__get_accChild(variant, byref(ptr)) #and passing it as **
     
     res = POINTER(IAccessible)()
     ptr._IUnknown__com_QueryInterface(byref(IAccessible._iid_), byref(res)) #the only thing worse
