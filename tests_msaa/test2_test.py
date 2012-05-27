@@ -33,8 +33,7 @@ class A11yTest1(unittest.TestCase):
         pyshell.runShellHere({'runner' : self.runner,
                               'I' : self.runner.controller.IAccessible,
                               'O' : self.runner.controller.AccessibleObject,
-                              'ma' : ma,
-                              'r' : r
+                              'ma' : ma
                               })
         
         

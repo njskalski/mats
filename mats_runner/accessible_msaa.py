@@ -17,16 +17,14 @@ import winconstants
 def getAccessibleElementFromMsaa(msaa, IAccessible):
     res = AccessibleElement(getName(msaa))
     
-    #functional programming frenzy!
-    children = [getMsaaChild(msaa, i, IAccessible) for i in range(0, getChildCount(msaa))]
-    res.extend([getAccessibleElementFromMsaa(child) for child in children])
+    children = getMsaaChildren(msaa)
+    #res.extend([getAccessibleElementFromMsaa(child) for child in children])
 
 
 def getName(msaa):
     s = BSTR()
     variant = VARIANT(c_long(winconstants.CHILDID_SELF),VT_I4)
-    print variant
-    msaa._IAccessible__com__get_accName(variant, byref(s))
+    assert(msaa._IAccessible__com__get_accName(variant, byref(s)) == 0)
     return s.value
     #return msaa.accName()
 
@@ -35,19 +33,14 @@ def getChildCount(msaa):
     assert(msaa._IAccessible__com__get_accChildCount(byref(num_c)) == 0)
     return num_c.value
 
-def getMsaaChild(msaa, childnum, IAccessible):
-    '''
-    I guess there is no difference if childnum is Integer or c_int/c_long here.
-    '''
-    print 'call:',
-    print (msaa, childnum)
+def getMsaaChildren(msaa):
+    numChildren = getChildCount(msaa)
+    array = (VARIANT * numChildren)()
+    rescount = c_long()
+    oledll.oleacc.AccessibleChildren(msaa, 0, numChildren, array, byref(rescount))
+    print 'asked for ' + str(numChildren)
+    print 'received' + str(rescount)
     
-    variant = VARIANT(childnum, VT_I4)
-    ptr = POINTER(IDispatch)() #creating null pointer of IDispatch type
-    msaa._IAccessible__com__get_accChild(variant, byref(ptr)) #and passing it as **
+    assert(numChildren == rescount.value)
     
-    res = POINTER(IAccessible)()
-    ptr._IUnknown__com_QueryInterface(byref(IAccessible._iid_), byref(res)) #the only thing worse
-    #than dynamic programming, is dynamic programming with windows.
-    
-    return res
+    return [x.value for x in array]
