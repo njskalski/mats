@@ -7,40 +7,49 @@
 #oh, btw, and guy who couln't have decided once if there should be one or two
 #underscores after each 'com' infix - make up your mind!
 
-from accessible import AccessibleElement
+from accessible import AccessibleElement, AccessibleTree
 
-from ctypes import *
+import ctypes
+from ctypes import c_long, byref
+import comtypes
 from comtypes import BSTR
-from comtypes.automation import IDispatch, VARIANT, VT_I4
+from comtypes.automation import IDispatch, VARIANT, VT_I4, POINTER
 import winconstants
 
-def getAccessibleElementFromMsaa(msaa):        
-    res = AccessibleElement({'name': getName(msaa)})
-        
-    children = getMsaaChildren(msaa)
-    res.extend([getAccessibleElementFromMsaa(child) for child in children])
-        
-    return res
+def getAccessibleTreeFromMsaa(root):
+    return AccessibleTree(getAccessibleElementFromMsaa(root))
+
+def getAccessibleElementFromMsaa(node):
+    if node.__class__ == POINTER(comtypes.gen.Accessibility.IAccessible):
+                    
+        res = AccessibleElement({'name': getName(node)})
+            
+        children = getMsaaChildren(node)
+        res.extend([getAccessibleElementFromMsaa(child) for child in children])
+            
+        return res
+    else:
+        print node.__class__
+        return AccessibleElement({'type' : str(node.__class__)})
     
-def getName(msaa):
+def getName(node):
     s = BSTR()
     variant = VARIANT(c_long(winconstants.CHILDID_SELF),VT_I4)
-    if msaa._IAccessible__com__get_accName(variant, byref(s)) == 0:
+    if node._IAccessible__com__get_accName(variant, byref(s)) == 0:
         return s.value
     else:
-        return None
+        return 'error'
 
-def getChildCount(msaa):
+def getChildCount(node):
     num_c = c_long()
-    assert(msaa._IAccessible__com__get_accChildCount(byref(num_c)) == 0)
+    assert(node._IAccessible__com__get_accChildCount(byref(num_c)) == 0)
     return num_c.value
 
-def getMsaaChildren(msaa):
-    numChildren = getChildCount(msaa)
+def getMsaaChildren(node):
+    numChildren = getChildCount(node)
     array = (VARIANT * numChildren)()
     rescount = c_long()
-    oledll.oleacc.AccessibleChildren(msaa, 0, numChildren, array, byref(rescount))
+    comtypes.oledll.oleacc.AccessibleChildren(node, 0, numChildren, array, byref(rescount))
     assert(numChildren == rescount.value)
     
-    print [x.value for x in array]
-    return []
+    return [x.value for x in array]

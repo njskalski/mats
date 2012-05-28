@@ -3,10 +3,17 @@
 # You can obtain one at http://mozilla.org/MPL/2.0/.
 
 # this is an abstraction layer representing an Accessible Object, os-independetly
+# it is written now only to support MSAA, abstraction is to be added later
 
-from xml.etree.ElementTree import Element
+from xml.etree.ElementTree import Element, ElementTree
 
 class AccessibleElement(Element):
-    def __init__(self, attrs):
-        Element.__init__(self, 'accessible', attrs)
+    def __init__(self, IAccessibleNode, attrib = {}):
+        Element.__init__(self, 'accessible', attrib)
+        self.node = IAccessibleNode
+        
+class AccessibleTree(ElementTree):
+    def __init__(self, element = None, file = None):
+        ElementTree.__init__(self, element, file)
+
     

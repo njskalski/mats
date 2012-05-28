@@ -20,8 +20,9 @@ class A11yTest1(unittest.TestCase):
         
     def test_whatever(self):
         
+        tree = None
         try:
-            tree = ma.getAccessibleElementFromMsaa(self.runner.controller.AccessibleObject)
+            tree = ma.getAccessibleTreeFromMsaa(self.runner.controller.AccessibleObject)
             print str(tree)
         except Exception as e:
             pyshell.falle(e, {'runner' : self.runner,
@@ -30,11 +31,12 @@ class A11yTest1(unittest.TestCase):
                               'ma' : ma
                               })
             
-#        pyshell.runShellHere({'runner' : self.runner,
-#                              'I' : self.runner.controller.IAccessible,
-#                              'O' : self.runner.controller.AccessibleObject,
-#                              'ma' : ma
-#                              })
+        pyshell.runShellHere({'runner' : self.runner,
+                              'I' : self.runner.controller.IAccessible,
+                              'O' : self.runner.controller.AccessibleObject,
+                              'ma' : ma,
+                              'tree': tree,
+                              })
         
         
     def tearDown(self):
