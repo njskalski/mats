@@ -9,7 +9,9 @@ from xml.etree.ElementTree import Element, ElementTree
 
 class AccessibleElement(Element):
     def __init__(self, IAccessibleNode, attrib = {}):
-        Element.__init__(self, 'accessible', attrib)
+        nonEmptyAttrib = {k : v for k,v in attrib.iteritems() if v != None}
+        
+        Element.__init__(self, 'accessible', nonEmptyAttrib)
         self.node = IAccessibleNode
         
 class AccessibleTree(ElementTree):

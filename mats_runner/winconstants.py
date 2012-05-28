@@ -74,3 +74,7 @@ WINEVENT_INCONTEXT = 0x0004
 # http://msdn.microsoft.com/en-us/library/windows/desktop/dd373640%28v=vs.85%29.aspx
 
 CHILDID_SELF = 0
+
+
+S_OK = 0
+S_FALSE = 1
