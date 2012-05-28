@@ -8,9 +8,8 @@ sys.path.append('../')
 from mats_runner import MatsRunner, pyshell 
 import unittest
 from time import sleep
-import os
 from mats_runner import winconstants
-
+import os
 from mats_runner import accessible_msaa as ma
 
 class A11yTest1(unittest.TestCase):
@@ -18,26 +17,12 @@ class A11yTest1(unittest.TestCase):
         self.runner = MatsRunner(config_file = '../winconfig.ini', url = 'file://' + os.path.join(os.getcwd(), 'pages', 'test1.html'))
         self.runner.start()
         
-    def test_whatever(self):
+    def test_tree_to_xml_works(self):
+        tree = ma.getAccessibleTreeFromMsaa(self.runner.controller.AccessibleObject)
         
-        tree = None
-        try:
-            tree = ma.getAccessibleTreeFromMsaa(self.runner.controller.AccessibleObject)
-            print str(tree)
-        except Exception as e:
-            pyshell.falle(e, {'runner' : self.runner,
-                              'I' : self.runner.controller.IAccessible,
-                              'O' : self.runner.controller.AccessibleObject,
-                              'ma' : ma
-                              })
-            
-        pyshell.runShellHere({'runner' : self.runner,
-                              'I' : self.runner.controller.IAccessible,
-                              'O' : self.runner.controller.AccessibleObject,
-                              'ma' : ma,
-                              'tree': tree,
-                              })
-        
+        xml_output = open("testXML_output.xml", "w")
+        tree.write(xml_output)
+        xml_output.close()
         
     def tearDown(self):
         self.runner.stop()
