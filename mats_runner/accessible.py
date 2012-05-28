@@ -8,11 +8,15 @@
 from xml.etree.ElementTree import Element, ElementTree
 
 class AccessibleElement(Element):
-    def __init__(self, IAccessibleNode, attrib = {}):
+    def __init__(self, os_spec, attrib = {}):
+        '''
+        os_spec is OS-specific data
+        '''
+        
         nonEmptyAttrib = {k : v for k,v in attrib.iteritems() if v != None}
         
         Element.__init__(self, 'accessible', nonEmptyAttrib)
-        self.node = IAccessibleNode
+        self.node = os_spec
         
 class AccessibleTree(ElementTree):
     def __init__(self, element = None, file = None):
