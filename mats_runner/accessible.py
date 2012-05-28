@@ -15,7 +15,12 @@ class AccessibleElement(Element):
         
         nonEmptyAttrib = {k : v for k,v in attrib.iteritems() if v != None}
         
-        Element.__init__(self, 'accessible', nonEmptyAttrib)
+        if os_spec[1] != 0: #not an IAccessible, but a child of it
+            name = 'accessibleChild'
+        else:
+            name = 'accessible'
+            
+        Element.__init__(self, name, nonEmptyAttrib)
         self.node = os_spec
         
 class AccessibleTree(ElementTree):
