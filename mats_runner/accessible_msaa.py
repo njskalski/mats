@@ -15,19 +15,18 @@
 # 2) child_id is 1-based, 0 means "node itself". You know, just so you make more mistakes.
 
 from accessible import AccessibleElement, AccessibleTree
-
+import comtypes
 import ctypes
 from ctypes import c_long, byref
-import comtypes
-from comtypes import BSTR
-from comtypes.automation import IDispatch, VARIANT, VT_I4, POINTER, VT_DISPATCH
+from comtypes.automation import IDispatch, VARIANT, VT_I4, POINTER, VT_DISPATCH, BSTR
 import winconstants
 
-def isMsaaNode(obj):
-    return obj.__class__ == POINTER(comtypes.gen.Accessibility.IAccessible)
-
 def intToVariant(i):
-    return VARIANT(i, VT_I4)
+    v = VARIANT()
+    v.vt = VT_I4
+    v.value = i
+    assert( isinstance(i, int) )
+    return v
 
 def getAccessibleTreeFromMsaa(root):
     return AccessibleTree(getAccessibleElementFromMsaa(root, winconstants.CHILDID_SELF))
@@ -59,10 +58,12 @@ def getRole(node, id):
         raise Exception("Unexpected behavior")
     
 def getName(node, id):
+    assert( isinstance(id, int) )
+    
     s = BSTR()
-    
-    variant = VARIANT(winconstants.CHILDID_SELF, VT_I4)
-    
+        
+    variant = VARIANT(id, VT_I4)
+
     HRESULT = node._IAccessible__com__get_accName(variant, byref(s))
   
     if HRESULT == comtypes.hresult.S_OK:
@@ -95,7 +96,8 @@ def getChildCount(node, id):
     if id != winconstants.CHILDID_SELF:
         return 0 #leaves have no children
     else:
-        num_c = c_long()
+                
+        num_c = ctypes.wintypes.LONG()
         HRESULT = node._IAccessible__com__get_accChildCount(byref(num_c))
         
         if HRESULT == comtypes.hresult.S_OK:
