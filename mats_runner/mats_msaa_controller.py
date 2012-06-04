@@ -112,7 +112,7 @@ class MatsMsaaController(MatsBaseController):
             self._listeners[winconstants.eventNameToInt[event_string]].add(callable)
         
     def deregister_event_listener(self, event_string, callable):
-        with self._stateCondition:
+        with self._stateCondition:#
             self._listeners[winconstants.eventNameToInt[event_string]].remove(callable)
 
     def _process_messages(self, messages):
