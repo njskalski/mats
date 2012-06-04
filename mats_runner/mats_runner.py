@@ -51,6 +51,7 @@ class MatsRunner(object):
             print 'Error: timeout, shutting down MATS'
             self.controller.stop()
             self.FirefoxThread.stop()
+            return
         
         #TODO: remove line below once https://bugzilla.mozilla.org/show_bug.cgi?id=753273 is fixed
         #sleep(10)

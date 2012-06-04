@@ -32,19 +32,25 @@ def getAccessibleTreeFromMsaa(root):
     return AccessibleTree(getAccessibleElementFromMsaa(root, winconstants.CHILDID_SELF))
 
 def getAccessibleElementFromMsaa(node, id):
+    print (node, id)
+    
     res = AccessibleElement(os_spec = ( node, id ),
                             attrib = {
                                       'name' : getName(node, id),
                                       'description' : getDescription(node, id),
                                       'role' : getRole(node, id),
+                                      'default-action' : getDefaultAction(node,id),
                                       })
+    
+    location = getLocation(node, id)
+    for k, v in location.iteritems():
+        res.set(k, v)
             
     children = getMsaaChildren(node, id)
     
     res.extend([getAccessibleElementFromMsaa(node, id) for (node, id) in children])
             
     return res
-
 
 def getRole(node, id):
     variant = intToVariant(id)
@@ -57,9 +63,47 @@ def getRole(node, id):
     else:
         raise Exception("Unexpected behavior")
     
-def getName(node, id):
-    assert( isinstance(id, int) )
+def getLocation(node, id):
+    variant = intToVariant(id)
+    res = [c_long(), c_long(), c_long(), c_long()] #left, top, width, height
+    HRESULT = node._IAccessible__com_accLocation(byref(res[0]),
+                                                  byref(res[1]),
+                                                  byref(res[2]),
+                                                  byref(res[3]),
+                                                  variant)
+    if HRESULT == comtypes.hresult.S_OK:
+        return {'left'      : str(res[0].value),
+                'top'       : str(res[1].value), 
+                'width'     : str(res[2].value),
+                'height'    : str(res[3].value)
+                }
+    elif HRESULT == comtypes.hresult.S_FALSE:
+        return {}
+    elif HRESULT == comtypes.hresult.DISP_E_MEMBERNOTFOUND:
+        return {}
+    elif HRESULT == comtypes.hresult.E_INVALIDARG:
+        raise Exception("Invalid argument")
+    else:
+        raise Exception("Unexpected behavior: " + str(HRESULT))
     
+def getDefaultAction(node, id):
+    variant = intToVariant(id)
+    s = BSTR()    
+    
+    HRESULT = node._IAccessible__com__get_accDefaultAction(variant, byref(s))
+    
+    if HRESULT == comtypes.hresult.S_OK:
+        return s.value
+    elif HRESULT == comtypes.hresult.S_FALSE:
+        return None
+    elif HRESULT == comtypes.hresult.DISP_E_MEMBERNOTFOUND:
+        return None
+    elif HRESULT == comtypes.hresult.E_INVALIDARG:
+        raise Exception("Invalid argument")
+    else:
+        raise Exception("Unexpected behavior: " + str(HRESULT))
+    
+def getName(node, id):
     s = BSTR()
         
     variant = VARIANT(id, VT_I4)
