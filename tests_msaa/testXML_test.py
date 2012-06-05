@@ -20,7 +20,7 @@ class A11yTest1(unittest.TestCase):
     def test_tree_to_xml_works(self):
         tree = ma.getAccessibleTreeFromMsaa(self.runner.controller.AccessibleObject)
         
-        xml_output = open("testXML_output.xml", "w")
+        xml_output = open("XML_output.xml", "w")
         tree.write(xml_output)
         xml_output.close()
         

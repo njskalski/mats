@@ -40,6 +40,7 @@ def getAccessibleElementFromMsaa(node, id):
                                       'description' : getDescription(node, id),
                                       'role' : getRole(node, id),
                                       'default-action' : getDefaultAction(node,id),
+                                      'help' : getHelp(node,id),
                                       })
     
     location = getLocation(node, id)
@@ -90,7 +91,11 @@ def getDefaultAction(node, id):
     variant = intToVariant(id)
     s = BSTR()    
     
-    HRESULT = node._IAccessible__com__get_accDefaultAction(variant, byref(s))
+    try:
+        HRESULT = node._IAccessible__com__get_accDefaultAction(variant, byref(s))
+    except Exception as e:
+        print 'COM error in get_accDefaultAction: ' + str(e) #TODO investigate that
+        return None
     
     if HRESULT == comtypes.hresult.S_OK:
         return s.value
@@ -102,7 +107,28 @@ def getDefaultAction(node, id):
         raise Exception("Invalid argument")
     else:
         raise Exception("Unexpected behavior: " + str(HRESULT))
+
+def getHelp(node, id):
+    variant = intToVariant(id)
+    s = BSTR()    
     
+    try:
+        HRESULT = node._IAccessible__com__get_accHelp(variant, byref(s))
+    except Exception as e:
+        print 'COM error in get_accHelp: ' + str(e) #TODO investigate that
+        return None
+    
+    if HRESULT == comtypes.hresult.S_OK:
+        return s.value
+    elif HRESULT == comtypes.hresult.S_FALSE:
+        return None
+    elif HRESULT == comtypes.hresult.DISP_E_MEMBERNOTFOUND:
+        return None
+    elif HRESULT == comtypes.hresult.E_INVALIDARG:
+        raise Exception("Invalid argument")
+    else:
+        raise Exception("Unexpected behavior: " + str(HRESULT))
+   
 def getName(node, id):
     s = BSTR()
         
