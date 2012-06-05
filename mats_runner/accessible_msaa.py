@@ -39,8 +39,10 @@ def getAccessibleElementFromMsaa(node, id):
                                       'name' : getName(node, id),
                                       'description' : getDescription(node, id),
                                       'role' : getRole(node, id),
+                                      'state' : getState(node,id),
                                       'default-action' : getDefaultAction(node,id),
                                       'help' : getHelp(node,id),
+                                      'keyboard-shortcut' : getKeyboardShortcut(node,id),
                                       })
     
     location = getLocation(node, id)
@@ -108,14 +110,14 @@ def getDefaultAction(node, id):
     else:
         raise Exception("Unexpected behavior: " + str(HRESULT))
 
-def getHelp(node, id):
+def getKeyboardShortcut(node, id):
     variant = intToVariant(id)
     s = BSTR()    
     
     try:
-        HRESULT = node._IAccessible__com__get_accHelp(variant, byref(s))
+        HRESULT = node._IAccessible__com__get_accKeyboardShortcut(variant, byref(s))
     except Exception as e:
-        print 'COM error in get_accHelp: ' + str(e) #TODO investigate why it never works
+        print 'COM error in accKeyboardShortcut: ' + str(e)
         return None
     
     if HRESULT == comtypes.hresult.S_OK:
@@ -128,7 +130,43 @@ def getHelp(node, id):
         raise Exception("Invalid argument")
     else:
         raise Exception("Unexpected behavior: " + str(HRESULT))
-   
+
+
+def getHelp(node, id):
+    variant = intToVariant(id)
+    s = BSTR()    
+    
+    try:
+        HRESULT = node._IAccessible__com__get_accHelp(variant, byref(s))
+    except Exception as e:
+        print 'COM error in get_accHelp: ' + str(e)
+        return None
+    
+    if HRESULT == comtypes.hresult.S_OK:
+        return s.value
+    elif HRESULT == comtypes.hresult.S_FALSE:
+        return None
+    elif HRESULT == comtypes.hresult.DISP_E_MEMBERNOTFOUND:
+        return None
+    elif HRESULT == comtypes.hresult.E_INVALIDARG:
+        raise Exception("Invalid argument")
+    else:
+        raise Exception("Unexpected behavior: " + str(HRESULT))
+
+def getState(node, id):
+        
+    variant = VARIANT(id, VT_I4)
+    res = VARIANT()
+
+    HRESULT = node._IAccessible__com__get_accState(variant, byref(res))
+  
+    if HRESULT == comtypes.hresult.S_OK:
+        return res.value
+    elif HRESULT == comtypes.hresult.E_INVALIDARG:
+        raise Exception("Argument not valid")
+    else:
+        raise Exception("Function output not valid!")
+
 def getName(node, id):
     s = BSTR()
         

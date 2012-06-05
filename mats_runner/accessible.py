@@ -3,7 +3,7 @@
 # You can obtain one at http://mozilla.org/MPL/2.0/.
 
 # this is an abstraction layer representing an Accessible Object, os-independetly
-# it is written now only to support MSAA, abstraction is to be added later
+# it is written now only to support #TODO investigate why it never works MSAA, abstraction is to be added later
 
 from xml.etree.ElementTree import Element, ElementTree
 
@@ -13,7 +13,7 @@ class AccessibleElement(Element):
         os_spec is OS-specific data
         '''
         
-        nonEmptyAttrib = {k : v for k,v in attrib.iteritems() if v != None}
+        nonEmptyAttrib = {k : v for k,v in attrib.iteritems() if v != None and v != ''}
         
         if os_spec[1] != 0: #not an IAccessible, but a child of it
             name = 'accessibleChild'
