@@ -14,6 +14,9 @@
 # as pair of (IAccessible , integer)
 # 2) child_id is 1-based, 0 means "node itself". You know, just so you make more mistakes.
 
+
+#maybe initiate everything lazy?
+
 from accessible import AccessibleElement, AccessibleTree
 import comtypes
 import ctypes
@@ -38,6 +41,7 @@ def getAccessibleElementFromMsaa(node, id):
                             attrib = {
                                       'name' : getName(node, id),
                                       'description' : getDescription(node, id),
+                                      'value' : getValue(node, id),
                                       'role' : getRole(node, id),
                                       'state' : getState(node,id),
                                       'default-action' : getDefaultAction(node,id),
@@ -110,6 +114,27 @@ def getDefaultAction(node, id):
     else:
         raise Exception("Unexpected behavior: " + str(HRESULT))
 
+def getValue(node, id):
+    variant = intToVariant(id)
+    s = BSTR()    
+    
+    try:
+        HRESULT = node._IAccessible__com__get_accValue(variant, byref(s))
+    except Exception as e:
+        print 'COM error in accValue: ' + str(e)
+        return None
+    
+    if HRESULT == comtypes.hresult.S_OK:
+        return s.value
+    elif HRESULT == comtypes.hresult.S_FALSE: #not in documentation, but happens.
+        return None
+    elif HRESULT == comtypes.hresult.DISP_E_MEMBERNOTFOUND:
+        return None
+    elif HRESULT == comtypes.hresult.E_INVALIDARG:
+        raise Exception("Invalid argument")
+    else:
+        raise Exception("Unexpected behavior: " + str(HRESULT))
+
 def getKeyboardShortcut(node, id):
     variant = intToVariant(id)
     s = BSTR()    
@@ -161,7 +186,7 @@ def getState(node, id):
     HRESULT = node._IAccessible__com__get_accState(variant, byref(res))
   
     if HRESULT == comtypes.hresult.S_OK:
-        return res.value
+        return str(res.value) #TODO add int->name mapping
     elif HRESULT == comtypes.hresult.E_INVALIDARG:
         raise Exception("Argument not valid")
     else:
