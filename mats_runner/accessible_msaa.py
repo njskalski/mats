@@ -115,7 +115,7 @@ def getHelp(node, id):
     try:
         HRESULT = node._IAccessible__com__get_accHelp(variant, byref(s))
     except Exception as e:
-        print 'COM error in get_accHelp: ' + str(e) #TODO investigate that
+        print 'COM error in get_accHelp: ' + str(e) #TODO investigate why it never works
         return None
     
     if HRESULT == comtypes.hresult.S_OK:
