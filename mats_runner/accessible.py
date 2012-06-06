@@ -7,6 +7,8 @@
 
 from xml.etree.ElementTree import Element, ElementTree
 
+from accessible_msaa import doDefaultAction, putValue
+
 class AccessibleElement(Element):
     def __init__(self, os_spec, attrib = {}):
         '''
@@ -22,7 +24,12 @@ class AccessibleElement(Element):
             
         Element.__init__(self, name, nonEmptyAttrib)
         self.node = os_spec
+    
+    def do_default_action(self):
+        doDefaultAction(self.os_spec)
         
+    
+    
 class AccessibleTree(ElementTree):
     def __init__(self, element = None, file = None):
         ElementTree.__init__(self, element, file)

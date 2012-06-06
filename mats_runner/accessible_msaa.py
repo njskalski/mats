@@ -59,6 +59,48 @@ def getAccessibleElementFromMsaa(node, id):
             
     return res
 
+def doDefaultAction(os_spec):
+    node, id = os_spec
+    
+    variant = intToVariant(id)
+    
+    try:
+        HRESULT = node._IAccessible__com__acc_doDefaultAction(variant)
+    except Exception as e:
+        print "COM error in doDefaultAction: " + str(e)
+        return False
+    
+    if HRESULT == comtypes.hresult.S_OK:
+        return True
+    elif HRESULT == comtypes.hresult.E_INVALIDARG:
+        raise Exception("Invalid argument") 
+    elif HRESULT == comtypes.hresult.DISP_E_MEMBERNOTFOUND :
+        raise Exception("Member not found")
+    else:
+        raise Exception("Unexpected behavior")
+    
+
+def putValue(os_spec, input_string):
+    node, id = os_spec
+    variant = intToVariant(id)
+    s = BSTR(input_string)
+    
+    try:
+        HRESULT = node._IAccessible__com__acc_doDefaultAction(variant)
+    except Exception as e:
+        print "COM error in doDefaultAction: " + str(e)
+        return False
+    
+    if HRESULT == comtypes.hresult.S_OK:
+        return True
+    elif HRESULT == comtypes.hresult.E_INVALIDARG:
+        raise Exception("Invalid argument") 
+    elif HRESULT == comtypes.hresult.DISP_E_MEMBERNOTFOUND :
+        raise Exception("Member not found")
+    else:
+        raise Exception("Unexpected behavior")
+    
+
 def getRole(node, id):
     variant = intToVariant(id)
     res = VARIANT(0, VT_I4)
