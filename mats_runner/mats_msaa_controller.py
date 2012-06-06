@@ -14,6 +14,8 @@ from threading import Event, Lock, Condition
 
 from collections import defaultdict
 
+from accessible_msaa import getAccessibleTreeFromMsaa
+
 class MatsMsaaController(MatsBaseController):
     
     def __init__(self, pid):
@@ -158,5 +160,5 @@ class MatsMsaaController(MatsBaseController):
         return Nightlies[0][0]
     
     def getAccessibleTree(self):
-        return getAccessibleElementFromMsaa(self.AccessibleObject)
+        return getAccessibleTreeFromMsaa(self.AccessibleObject)
         

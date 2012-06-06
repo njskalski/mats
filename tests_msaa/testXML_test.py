@@ -18,7 +18,7 @@ class A11yTest1(unittest.TestCase):
         self.runner.start()
         
     def test_tree_to_xml_works(self):
-        tree = ma.getAccessibleTreeFromMsaa(self.runner.controller.AccessibleObject)
+        tree = self.runner.controller.getAccessibleTree()
         
         xml_output = open("XML_output.xml", "w")
         tree.write(xml_output)

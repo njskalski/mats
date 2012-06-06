@@ -165,3 +165,4 @@ return (app) ? true : false;
         self.controller.pause_event_loop()
         self.controller.deregister_event_listener(event_string, callback)
         return result
+     

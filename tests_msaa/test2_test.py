@@ -2,7 +2,9 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this file,
 # You can obtain one at http://mozilla.org/MPL/2.0/.
 
-#this test tests, whether EVENT_OBJECT_FOCUS is fired once a button is clicked
+#this test tests, whether if Firefox stops once 'x' is clicked :)
+
+#this test presently fails, don't know why
 
 import sys
 sys.path.append('../')
@@ -20,17 +22,18 @@ class A11yTest1(unittest.TestCase):
         
     def test_whatever(self):
         
-        self.assertEqual(True,self.runner.instantiate_a11y())
+        self.assertEqual(True, self.runner.instantiate_a11y())
 
-        button = self.runner.marionette.find_element(method = 'id', target = 'button1')
+        tree = self.runner.controller.getAccessibleTree()
         
-        self.assertTrue(
-            self.runner.wait_for_event('EVENT_OBJECT_FOCUS', button.click, timeout = 10)
-            )
+        system_close_button = tree.find('./accessible[@name="System"]/accessible[@name="System"]/accessible[@name="System"]/accessibleChild[@keyboard-shortcut="c"]')
+        self.assertEqual(system_close_button.get('default-action'), 'Execute') 
+        self.assertTrue(system_close_button.do_default_action())
+        self.runner.wait_for_stop()
         pass
             
     def tearDown(self):
-        self.runner.stop()
+        #self.runner.stop() #not in this test!
         pass
         
 

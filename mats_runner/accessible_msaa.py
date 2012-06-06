@@ -61,13 +61,14 @@ def getAccessibleElementFromMsaa(node, id):
 
 def doDefaultAction(os_spec):
     node, id = os_spec
-    
+
     variant = intToVariant(id)
     
     try:
-        HRESULT = node._IAccessible__com__acc_doDefaultAction(variant)
+        HRESULT = node._IAccessible__com_accDoDefaultAction(variant)
+        HRESULT = node.accDoDefaultAction(variant)
     except Exception as e:
-        print "COM error in doDefaultAction: " + str(e)
+        print "COM error in doDefaultAction: " + e.text + " details : " + str(e.details)
         return False
     
     if HRESULT == comtypes.hresult.S_OK:
@@ -86,9 +87,9 @@ def putValue(os_spec, input_string):
     s = BSTR(input_string)
     
     try:
-        HRESULT = node._IAccessible__com__acc_doDefaultAction(variant)
+        HRESULT = node.__com__set_accValue(variant) # no clue why no IAc... prefix!
     except Exception as e:
-        print "COM error in doDefaultAction: " + str(e)
+        print "COM error in doDefaultAction: " + e.message
         return False
     
     if HRESULT == comtypes.hresult.S_OK:
@@ -142,7 +143,7 @@ def getDefaultAction(node, id):
     try:
         HRESULT = node._IAccessible__com__get_accDefaultAction(variant, byref(s))
     except Exception as e:
-        print 'COM error in get_accDefaultAction: ' + str(e) #TODO investigate that
+        print 'COM error in get_accDefaultAction: ' + e.message #TODO investigate that
         return None
     
     if HRESULT == comtypes.hresult.S_OK:
@@ -157,13 +158,18 @@ def getDefaultAction(node, id):
         raise Exception("Unexpected behavior: " + str(HRESULT))
 
 def getValue(node, id):
+    if id != winconstants.CHILDID_SELF:
+        return None #TODO this condition was added to remove some of warnings - chceck if that's the way it should work
+    
+    
     variant = intToVariant(id)
     s = BSTR()    
     
     try:
         HRESULT = node._IAccessible__com__get_accValue(variant, byref(s))
     except Exception as e:
-        print 'COM error in accValue: ' + str(e)
+        print 'COM error in accValue: ' + e.message
+        
         return None
     
     if HRESULT == comtypes.hresult.S_OK:
@@ -184,7 +190,7 @@ def getKeyboardShortcut(node, id):
     try:
         HRESULT = node._IAccessible__com__get_accKeyboardShortcut(variant, byref(s))
     except Exception as e:
-        print 'COM error in accKeyboardShortcut: ' + str(e)
+        print 'COM error in accKeyboardShortcut: ' + e.message
         return None
     
     if HRESULT == comtypes.hresult.S_OK:
@@ -206,7 +212,7 @@ def getHelp(node, id):
     try:
         HRESULT = node._IAccessible__com__get_accHelp(variant, byref(s))
     except Exception as e:
-        print 'COM error in get_accHelp: ' + str(e)
+        print 'COM error in get_accHelp: ' + e.message
         return None
     
     if HRESULT == comtypes.hresult.S_OK:

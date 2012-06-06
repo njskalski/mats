@@ -7,7 +7,16 @@
 
 from xml.etree.ElementTree import Element, ElementTree
 
-from accessible_msaa import doDefaultAction, putValue
+from platform import system
+osname = system()
+
+if osname == 'Linux':
+    pass #TODO implement accessible_atspi 
+elif osname == 'Windows':
+    import accessible_msaa as accessible_system
+else:
+    raise Exception("Unsupported platform " + osname + ".")
+
 
 class AccessibleElement(Element):
     def __init__(self, os_spec, attrib = {}):
@@ -23,12 +32,13 @@ class AccessibleElement(Element):
             name = 'accessible'
             
         Element.__init__(self, name, nonEmptyAttrib)
-        self.node = os_spec
+        self.os_spec = os_spec
     
     def do_default_action(self):
-        doDefaultAction(self.os_spec)
+        return accessible_system.doDefaultAction(self.os_spec)
         
-    
+    def put_value(self, input_string):
+        return accessible_system.putValue(self.os_spec, input_string)
     
 class AccessibleTree(ElementTree):
     def __init__(self, element = None, file = None):
