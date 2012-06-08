@@ -6,6 +6,10 @@
 # it is written now only to support #TODO investigate why it never works MSAA, abstraction is to be added later
 
 from xml.etree.ElementTree import Element, ElementTree
+from lxml.etree import ElementBase
+
+import ctypes
+import comtypes
 
 from platform import system
 osname = system()
@@ -18,21 +22,28 @@ else:
     raise Exception("Unsupported platform " + osname + ".")
 
 
-class AccessibleElement(Element):
-    def __init__(self, os_spec, attrib = {}):
-        '''
-        os_spec is OS-specific data
-        '''
-        
-        nonEmptyAttrib = {k : v for k,v in attrib.iteritems() if v != None and v != ''}
-        
-        if os_spec[1] != 0: #not an IAccessible, but a child of it
-            name = 'accessibleChild'
-        else:
-            name = 'accessible'
-            
-        Element.__init__(self, name, nonEmptyAttrib)
-        self.os_spec = os_spec
+class AccessibleElement(ElementBase):
+#    def __init__(self, os_spec, attrib = {}):
+#        '''
+#        os_spec is OS-specific data
+#        '''
+#        
+#        nonEmptyAttrib = {k : v for k,v in attrib.iteritems() if v != None and v != ''}
+#        
+#        if os_spec[1] != 0: #not an IAccessible, but a child of it
+#            name = 'accessibleChild'
+#        else:
+#            name = 'accessible'
+#            
+#        ElementBase.__init__(self, name, nonEmptyAttrib)
+#        self.os_spec = os_spec
+
+    def _init(self):
+        win_node_addr = self.get('win_node_addr')
+        print win_node_addr
+        node = ctypes.cast(int(win_node_addr), ctypes.POINTER(comtypes.gen.Accessibility.IAccessible))
+        id = int(self.get('win_node_childid'))
+        self.os_spec = (node, id)
     
     def do_default_action(self):
         return accessible_system.doDefaultAction(self.os_spec)

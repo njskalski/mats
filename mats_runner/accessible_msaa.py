@@ -37,24 +37,32 @@ def getAccessibleTreeFromMsaa(root):
 def getAccessibleElementFromMsaa(node, id):
     print (node, id)
     
-    res = AccessibleElement(os_spec = ( node, id ),
-                            attrib = {
-                                      'name' : getName(node, id),
-                                      'description' : getDescription(node, id),
-                                      'value' : getValue(node, id),
-                                      'role' : getRole(node, id),
-                                      'state' : getState(node,id),
-                                      'default-action' : getDefaultAction(node,id),
-                                      'help' : getHelp(node,id),
-                                      'keyboard-shortcut' : getKeyboardShortcut(node,id),
-                                      })
+    attrib = {
+              'name' : getName(node, id),
+              'description' : getDescription(node, id), 
+              'value' : getValue(node, id),
+              'role' : getRole(node, id),
+              'state' : getState(node,id),
+              'default-action' : getDefaultAction(node,id),
+              'help' : getHelp(node,id),
+              'keyboard-shortcut' : getKeyboardShortcut(node,id),
+              }
     
     location = getLocation(node, id)
     for k, v in location.iteritems():
-        res.set(k, v)
-            
-    children = getMsaaChildren(node, id)
+        attrib[k] = v
     
+    #attrib["os_spec"] = (node, id)
+    attrib["win_node_addr"] = str(ctypes.cast(node, ctypes.c_void_p).value)
+    attrib["win_node_childid"] = str(id)
+    #nonEmptyAttrib = {k : v for k,v in attrib.iteritems() if v != None and v != ''}
+    
+    res = AccessibleElement('accessible')
+    for k,v in attrib.iteritems():
+        if v != None and v != '':
+            res.set(k, v)
+    
+    children = getMsaaChildren(node, id)
     res.extend([getAccessibleElementFromMsaa(node, id) for (node, id) in children])
             
     return res
@@ -89,7 +97,7 @@ def putValue(os_spec, input_string):
     try:
         HRESULT = node.__com__set_accValue(variant) # no clue why no IAc... prefix!
     except Exception as e:
-        print "COM error in doDefaultAction: " + e.message
+        print "COM error in putValue: " + e.text + " details : " + str(e.details)
         return False
     
     if HRESULT == comtypes.hresult.S_OK:
@@ -143,7 +151,7 @@ def getDefaultAction(node, id):
     try:
         HRESULT = node._IAccessible__com__get_accDefaultAction(variant, byref(s))
     except Exception as e:
-        print 'COM error in get_accDefaultAction: ' + e.message #TODO investigate that
+        print 'COM error in get_accDefaultAction: ' + e.text + " details : " + str(e.details)
         return None
     
     if HRESULT == comtypes.hresult.S_OK:
@@ -168,7 +176,7 @@ def getValue(node, id):
     try:
         HRESULT = node._IAccessible__com__get_accValue(variant, byref(s))
     except Exception as e:
-        print 'COM error in accValue: ' + e.message
+        print 'COM error in accValue: ' + e.text + " details : " + str(e.details)
         
         return None
     
@@ -190,7 +198,7 @@ def getKeyboardShortcut(node, id):
     try:
         HRESULT = node._IAccessible__com__get_accKeyboardShortcut(variant, byref(s))
     except Exception as e:
-        print 'COM error in accKeyboardShortcut: ' + e.message
+        print 'COM error in accKeyboardShortcut: ' + e.text + " details : " + str(e.details)
         return None
     
     if HRESULT == comtypes.hresult.S_OK:
@@ -212,7 +220,7 @@ def getHelp(node, id):
     try:
         HRESULT = node._IAccessible__com__get_accHelp(variant, byref(s))
     except Exception as e:
-        print 'COM error in get_accHelp: ' + e.message
+        print 'COM error in get_accHelp: '+ e.text + " details : " + str(e.details)
         return None
     
     if HRESULT == comtypes.hresult.S_OK:
