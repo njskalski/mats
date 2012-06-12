@@ -23,27 +23,8 @@ else:
 
 
 class AccessibleElement(ElementBase):
-#    def __init__(self, os_spec, attrib = {}):
-#        '''
-#        os_spec is OS-specific data
-#        '''
-#        
-#        nonEmptyAttrib = {k : v for k,v in attrib.iteritems() if v != None and v != ''}
-#        
-#        if os_spec[1] != 0: #not an IAccessible, but a child of it
-#            name = 'accessibleChild'
-#        else:
-#            name = 'accessible'
-#            
-#        ElementBase.__init__(self, name, nonEmptyAttrib)
-#        self.os_spec = os_spec
-
     def _init(self):
-        win_node_addr = self.get('win_node_addr')
-        print win_node_addr
-        node = ctypes.cast(int(win_node_addr), ctypes.POINTER(comtypes.gen.Accessibility.IAccessible))
-        id = int(self.get('win_node_childid'))
-        self.os_spec = (node, id)
+        self.os_spec = AccessibleTree._singleInstance.getOsSpec(int(self.get('mapping')))
     
     def do_default_action(self):
         return accessible_system.doDefaultAction(self.os_spec)
@@ -52,7 +33,23 @@ class AccessibleElement(ElementBase):
         return accessible_system.putValue(self.os_spec, input_string)
     
 class AccessibleTree(ElementTree):
-    def __init__(self, element = None, file = None):
+    '''
+    for now this is singleton :(
+    '''
+    _singleInstance = None
+     
+    
+    def __new__(cls, *args, **kwargs):
+        if not cls._singleInstance:
+            cls._singleInstance = super(AccessibleTree, cls).__new__(
+                                cls, *args, **kwargs)
+        return cls._singleInstance
+    
+    def __init__(self, element = None, file = None, mapping = None):
         ElementTree.__init__(self, element, file)
-
+        assert(mapping != None)
+        self.mapping = mapping
+        
+    def getOsSpec(self, num):
+        return self.mapping[num]
     

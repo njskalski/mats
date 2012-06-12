@@ -32,10 +32,18 @@ def intToVariant(i):
     return v
 
 def getAccessibleTreeFromMsaa(root):
-    return AccessibleTree(getAccessibleElementFromMsaa(root, winconstants.CHILDID_SELF))
+    mapping = {'num' : 0}
+    at = AccessibleTree(element = None, file = None, mapping = mapping)
+    root = getAccessibleElementFromMsaa(root, winconstants.CHILDID_SELF, mapping)
+    at._setroot(root)
+    return at
 
-def getAccessibleElementFromMsaa(node, id):
+def getAccessibleElementFromMsaa(node, id, mapping):
     print (node, id)
+    
+    num = mapping['num']
+    mapping['num'] += 1
+    mapping[num] = (node, id)
     
     attrib = {
               'name' : getName(node, id),
@@ -52,18 +60,14 @@ def getAccessibleElementFromMsaa(node, id):
     for k, v in location.iteritems():
         attrib[k] = v
     
-    #attrib["os_spec"] = (node, id)
-    attrib["win_node_addr"] = str(ctypes.cast(node, ctypes.c_void_p).value)
-    attrib["win_node_childid"] = str(id)
-    #nonEmptyAttrib = {k : v for k,v in attrib.iteritems() if v != None and v != ''}
+    attrib["mapping"] = str(num)
     
-    res = AccessibleElement('accessible')
-    for k,v in attrib.iteritems():
-        if v != None and v != '':
-            res.set(k, v)
+    notNoneAttrib = {k:v for k,v in attrib.iteritems() if v != None and v != ''}
+    
+    res = AccessibleElement(tag = 'accessible', attrib = notNoneAttrib)
     
     children = getMsaaChildren(node, id)
-    res.extend([getAccessibleElementFromMsaa(node, id) for (node, id) in children])
+    res.extend([getAccessibleElementFromMsaa(node, id, mapping) for (node, id) in children])
             
     return res
 
