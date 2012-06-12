@@ -26,7 +26,7 @@ class A11yTest1(unittest.TestCase):
 
         tree = self.runner.controller.getAccessibleTree()
         
-        system_close_button = tree.find('./accessible[@name="System"]/accessible[@name="System"]/accessible[@name="System"]/accessibleChild[@keyboard-shortcut="c"]')
+        system_close_button = tree.find('./AccessibleElement[@name="System"]/AccessibleElement[@name="System"]/AccessibleElement[@name="System"]/AccessibleElement[@keyboard-shortcut="c"]')
         self.assertEqual(system_close_button.get('default-action'), 'Execute') 
         self.assertTrue(system_close_button.do_default_action())
         self.runner.wait_for_stop()

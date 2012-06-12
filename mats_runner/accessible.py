@@ -5,8 +5,9 @@
 # this is an abstraction layer representing an Accessible Object, os-independetly
 # it is written now only to support #TODO investigate why it never works MSAA, abstraction is to be added later
 
-from xml.etree.ElementTree import Element, ElementTree
-from lxml.etree import ElementBase
+
+from lxml import etree
+
 
 import ctypes
 import comtypes
@@ -22,7 +23,7 @@ else:
     raise Exception("Unsupported platform " + osname + ".")
 
 
-class AccessibleElement(ElementBase):
+class AccessibleElement(etree.ElementBase):
     def _init(self):
         self.os_spec = AccessibleTree._singleInstance.getOsSpec(int(self.get('mapping')))
     
@@ -32,7 +33,7 @@ class AccessibleElement(ElementBase):
     def put_value(self, input_string):
         return accessible_system.putValue(self.os_spec, input_string)
     
-class AccessibleTree(ElementTree):
+class AccessibleTree(etree.ElementTree):
     '''
     for now this is singleton :(
     '''
@@ -43,6 +44,13 @@ class AccessibleTree(ElementTree):
         if not cls._singleInstance:
             cls._singleInstance = super(AccessibleTree, cls).__new__(
                                 cls, *args, **kwargs)
+
+            # from http://lxml.de/element_classes.html#setting-up-a-class-lookup-scheme
+            # TODO: should this be here?            
+            parser_lookup = etree.ElementDefaultClassLookup(element=AccessibleTree)
+            parser = etree.XMLParser()
+            parser.set_element_class_lookup(parser_lookup)
+
         return cls._singleInstance
     
     def __init__(self, element = None, file = None, mapping = None):
