@@ -26,13 +26,15 @@ class A11yTest1(unittest.TestCase):
 
         tree = self.runner.controller.getAccessibleTree()
 
-        print button = tree.xpath('//*[@name="Click me"]')
-#        self.assertEqual(len(close_button), 1)
-#        close_button = close_button[0]
-#        self.assertEqual(close_button.get('default-action'), 'Press') 
-#        self.assertTrue(close_button.do_default_action())
-#        self.runner.wait_for_stop()
-#        pass
+        button = tree.xpath('//*[@name="Click me" and @role="43"]')
+        
+        self.assertEqual(len(button), 1)
+        button = button[0]
+        
+        self.assertTrue(
+            self.runner.wait_for_event('EVENT_OBJECT_FOCUS', button.do_default_action, timeout = 10)
+            )
+        pass
             
     def tearDown(self):
         self.runner.stop()
