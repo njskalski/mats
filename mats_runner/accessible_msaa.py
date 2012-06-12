@@ -49,7 +49,7 @@ def getAccessibleTreeFromMsaa(root):
     return at
 
 def getAccessibleElementFromMsaa(node, id, mapping):
-    print (node, id)
+    #print (node, id)
     
     num = mapping['num']
     mapping['num'] += 1
@@ -64,6 +64,7 @@ def getAccessibleElementFromMsaa(node, id, mapping):
               'default-action' : getDefaultAction(node,id),
               'help' : getHelp(node,id),
               'keyboard-shortcut' : getKeyboardShortcut(node,id),
+              'child-id' : str(id),
               }
     
     location = getLocation(node, id)
@@ -89,7 +90,7 @@ def doDefaultAction(os_spec):
     
     try:
         HRESULT = node._IAccessible__com_accDoDefaultAction(variant)
-        HRESULT = node.accDoDefaultAction(variant)
+        #HRESULT = node.accDoDefaultAction(variant)
     except Exception as e:
         print "COM error in doDefaultAction: " + e.text + " details : " + str(e.details)
         return False

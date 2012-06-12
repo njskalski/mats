@@ -5,8 +5,6 @@
 # this is an abstraction layer representing an Accessible Object, os-independetly
 # it is written now only to support #TODO investigate why it never works MSAA, abstraction is to be added later
 
-
-#from xml.etree.ElementTree import ElementTree # this is not an error, there is no 'l' lacking here!
 from lxml import etree
 
 
@@ -29,6 +27,7 @@ class AccessibleElement(etree.ElementBase):
         self.os_spec = AccessibleTree._singleInstance.getOsSpec(int(self.get('mapping')))
     
     def do_default_action(self):
+        print 'doing default action with ' + str(self.get('mapping'))
         return accessible_system.doDefaultAction(self.os_spec)
         
     def put_value(self, input_string):

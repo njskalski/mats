@@ -26,18 +26,31 @@ class A11yTest1(unittest.TestCase):
 
         tree = self.runner.controller.getAccessibleTree()
         
-        button = tree.xpath('accessible[@name="System" and @role="2"]')
-        #/accessible[@name="System"]/accessible[@name="System"]/accessible[@default-action="Execute" and @keyboard-shortcut="c"]')
+        #this points to something else. No clue what. The MSAA is as intuitive as quantum mechanics
+#        menu_buttons = tree.xpath('accessible[@name="System" and @role="2"]/accessible[@name="System" and @role="12"]/accessible[@name="System" and @role="11"]/*')
+#        #/accessible[@name="System"]/accessible[@name="System"]/accessible[@default-action="Execute" and @keyboard-shortcut="c"]')
+#        
+#        print menu_buttons
+#        
+#        for button in menu_buttons:
+#            if "Close" in (button.get("name") or ""):
+#                close_button = button
+#                break
+#        
+#        self.assertEqual(close_button.get('default-action'), 'Execute')
+#        pyshell.runShellHere({'runner' : self.runner, 'but' : close_button})
+#        
         
-        print button
-        print button.get('mapping')
-        #self.assertEqual(system_close_button.get('default-action'), 'Execute') 
-        #self.assertTrue(system_close_button.do_default_action())
-        #self.runner.wait_for_stop()
+        close_button = tree.xpath('accessible[@value="MSAA test1 - Nightly"]/accessible[@name="Close" and @role="43"]')
+        self.assertEqual(len(close_button), 1)
+        close_button = close_button[0]
+        self.assertEqual(close_button.get('default-action'), 'Press') 
+        self.assertTrue(close_button.do_default_action())
+        self.runner.wait_for_stop()
         pass
             
     def tearDown(self):
-        self.runner.stop() #not in this test!
+        #self.runner.stop() #not in this test!
         pass
         
 
