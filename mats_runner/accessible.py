@@ -6,7 +6,7 @@
 # it is written now only to support #TODO investigate why it never works MSAA, abstraction is to be added later
 
 
-from xml.etree.ElementTree import ElementTree # this is not an error, there is no 'l' lacking here!
+#from xml.etree.ElementTree import ElementTree # this is not an error, there is no 'l' lacking here!
 from lxml import etree
 
 
@@ -34,7 +34,7 @@ class AccessibleElement(etree.ElementBase):
     def put_value(self, input_string):
         return accessible_system.putValue(self.os_spec, input_string)
     
-class AccessibleTree(ElementTree):
+class AccessibleTree(etree._ElementTree):
     '''
     for now this is singleton :(
     '''
@@ -49,7 +49,7 @@ class AccessibleTree(ElementTree):
         return cls._singleInstance
     
     def __init__(self, element = None, file = None, mapping = None):
-        ElementTree.__init__(self, element, file)
+        etree._ElementTree.__init__(self, element, file)
         assert(mapping != None)
         self.mapping = mapping
         

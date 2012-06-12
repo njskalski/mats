@@ -26,14 +26,18 @@ class A11yTest1(unittest.TestCase):
 
         tree = self.runner.controller.getAccessibleTree()
         
-        system_close_button = tree.find('./AccessibleElement[@name="System"]/AccessibleElement[@name="System"]/AccessibleElement[@name="System"]/AccessibleElement[@keyboard-shortcut="c"]')
-        self.assertEqual(system_close_button.get('default-action'), 'Execute') 
-        self.assertTrue(system_close_button.do_default_action())
-        self.runner.wait_for_stop()
+        button = tree.xpath('accessible[@name="System" and @role="2"]')
+        #/accessible[@name="System"]/accessible[@name="System"]/accessible[@default-action="Execute" and @keyboard-shortcut="c"]')
+        
+        print button
+        print button.get('mapping')
+        #self.assertEqual(system_close_button.get('default-action'), 'Execute') 
+        #self.assertTrue(system_close_button.do_default_action())
+        #self.runner.wait_for_stop()
         pass
             
     def tearDown(self):
-        #self.runner.stop() #not in this test!
+        self.runner.stop() #not in this test!
         pass
         
 

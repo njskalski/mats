@@ -83,6 +83,7 @@ def getAccessibleElementFromMsaa(node, id, mapping):
 
 def doDefaultAction(os_spec):
     node, id = os_spec
+    print 'dda:' + str( (node, id) )
 
     variant = intToVariant(id)
     
