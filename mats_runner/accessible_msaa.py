@@ -17,12 +17,22 @@
 
 #maybe initiate everything lazy?
 
+from lxml import etree
+
 from accessible import AccessibleElement, AccessibleTree
 import comtypes
 import ctypes
 from ctypes import c_long, byref
 from comtypes.automation import IDispatch, VARIANT, VT_I4, POINTER, VT_DISPATCH, BSTR
 import winconstants
+
+# from http://lxml.de/element_classes.html#setting-up-a-class-lookup-scheme
+# TODO: should this be here?            
+
+parser_lookup = etree.ElementDefaultClassLookup(element=AccessibleElement)
+parser = etree.XMLParser()
+parser.set_element_class_lookup(parser_lookup)
+Element = parser.makeelement
 
 def intToVariant(i):
     v = VARIANT()
@@ -64,7 +74,7 @@ def getAccessibleElementFromMsaa(node, id, mapping):
     
     notNoneAttrib = {k:v for k,v in attrib.iteritems() if v != None and v != ''}
     
-    res = AccessibleElement(tag = 'accessible', attrib = notNoneAttrib)
+    res = Element('accessible', attrib = notNoneAttrib)
     
     children = getMsaaChildren(node, id)
     res.extend([getAccessibleElementFromMsaa(node, id, mapping) for (node, id) in children])

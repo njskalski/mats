@@ -6,6 +6,7 @@
 # it is written now only to support #TODO investigate why it never works MSAA, abstraction is to be added later
 
 
+from xml.etree.ElementTree import ElementTree # this is not an error, there is no 'l' lacking here!
 from lxml import etree
 
 
@@ -33,7 +34,7 @@ class AccessibleElement(etree.ElementBase):
     def put_value(self, input_string):
         return accessible_system.putValue(self.os_spec, input_string)
     
-class AccessibleTree(etree.ElementTree):
+class AccessibleTree(ElementTree):
     '''
     for now this is singleton :(
     '''
@@ -44,12 +45,6 @@ class AccessibleTree(etree.ElementTree):
         if not cls._singleInstance:
             cls._singleInstance = super(AccessibleTree, cls).__new__(
                                 cls, *args, **kwargs)
-
-            # from http://lxml.de/element_classes.html#setting-up-a-class-lookup-scheme
-            # TODO: should this be here?            
-            parser_lookup = etree.ElementDefaultClassLookup(element=AccessibleTree)
-            parser = etree.XMLParser()
-            parser.set_element_class_lookup(parser_lookup)
 
         return cls._singleInstance
     
