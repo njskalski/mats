@@ -84,8 +84,7 @@ def getAccessibleElementFromMsaa(node, id, mapping):
 
 def doDefaultAction(os_spec):
     node, id = os_spec
-    print 'dda:' + str( (node, id) )
-
+    
     variant = intToVariant(id)
     
     try:
@@ -104,6 +103,29 @@ def doDefaultAction(os_spec):
     else:
         raise Exception("Unexpected behavior")
     
+def select(os_spec, flag):
+    node, id = os_spec
+    variant = intToVariant(id)
+    assert(isinstance(flag, int))
+    c_flag = c_long(flag)
+
+    try:
+        HRESULT = node._IAccessible__com_accSelect(flag, variant)
+        #HRESULT = node.accDoDefaultAction(variant)
+    except Exception as e:
+        print "COM error in accSelect: " + e.text + " details : " + str(e.details)
+        return False
+    
+    if HRESULT == comtypes.hresult.S_OK:
+        return True
+    elif HRESULT == comtypes.hresult.S_FALSE:
+        return False
+    elif HRESULT == comtypes.hresult.E_INVALIDARG:
+        raise Exception("Invalid argument") 
+    elif HRESULT == comtypes.hresult.DISP_E_MEMBERNOTFOUND :
+        raise Exception("Member not found")
+    else:
+        raise Exception("Unexpected behavior")
 
 def putValue(os_spec, input_string):
     node, id = os_spec

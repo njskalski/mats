@@ -74,3 +74,14 @@ WINEVENT_INCONTEXT = 0x0004
 # http://msdn.microsoft.com/en-us/library/windows/desktop/dd373640%28v=vs.85%29.aspx
 
 CHILDID_SELF = 0
+
+
+#taken from
+#http://msdn.microsoft.com/en-us/library/windows/desktop/dd373634%28v=vs.85%29.aspx
+			
+SELFLAG_NONE = 0
+SELFLAG_TAKEFOCUS = 0x1
+SELFLAG_TAKESELECTION = 0x2
+SELFLAG_EXTENDSELECTION = 0x4
+SELFLAG_ADDSELECTION = 0x8 
+SELFLAG_REMOVESELECTION = 0x10

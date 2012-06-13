@@ -33,6 +33,9 @@ class AccessibleElement(etree.ElementBase):
     def put_value(self, input_string):
         return accessible_system.putValue(self.os_spec, input_string)
     
+    def select(self, flag):
+        return accessible_system.select(self.os_spec, flag)
+    
 class AccessibleTree(etree._ElementTree):
     '''
     for now this is singleton :(
