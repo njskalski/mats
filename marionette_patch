@@ -1,0 +1,35 @@
+diff -r 938cdb639def browser/app/profile/firefox.js
+--- a/browser/app/profile/firefox.js    Mon Apr 23 21:13:17 2012 +0200
++++ b/browser/app/profile/firefox.js    Tue Apr 24 15:18:19 2012 -0700
+@@ -1152,3 +1152,7 @@
+ // number of startup crashes that can occur before starting into safe mode automatically
+ // (this pref has no effect if more than 6 hours have passed since the last crash)
+ pref("toolkit.startup.max_resumed_crashes", 2);
++
++// Marionette
++pref("marionette.defaultPrefs.enabled", true);
++pref("marionette.defaultPrefs.port", 2828);
+diff -r 937cdb639def browser/confvars.sh
+--- a/browser/confvars.sh       Mon Apr 23 21:13:17 2012 +0200
++++ b/browser/confvars.sh       Tue Apr 24 15:18:19 2012 -0700
+@@ -73,3 +73,4 @@
+ MOZ_PROFILE_MIGRATOR=1
+ MOZ_EXTENSION_MANAGER=1
+ MOZ_APP_STATIC_INI=1
++ENABLE_MARIONETTE=1
+diff -r 937cdb639def browser/installer/package-manifest.in
+--- a/browser/installer/package-manifest.in     Mon Apr 23 21:13:17 2012 +0200
++++ b/browser/installer/package-manifest.in     Tue Apr 24 15:18:19 2012 -0700
+@@ -626,6 +626,12 @@
+ @BINPATH@/components/*.xqs
+ #endif
+
++; [Marionette]
++@BINPATH@/chrome/marionette@JAREXT@
++@BINPATH@/chrome/marionette.manifest
++@BINPATH@/components/MarionetteComponents.manifest
++@BINPATH@/components/marionettecomponent.js
++
+ #ifdef MOZ_WEBAPP_RUNTIME
+ [WebappRuntime]
+ #ifdef XP_WIN
