@@ -1,0 +1,11 @@
+# HG changeset patch
+# Parent fe758ebc1707f681cc58df5651f1f68c1c761560
+
+diff --git a/browser/confvars.sh b/browser/confvars.sh
+--- a/browser/confvars.sh
++++ b/browser/confvars.sh
+@@ -41,3 +41,4 @@ MOZ_PROFILE_MIGRATOR=1
+ MOZ_EXTENSION_MANAGER=1
+ MOZ_APP_STATIC_INI=1
+ MOZ_WEBAPP_RUNTIME=1
++ENABLE_MARIONETTE=1
