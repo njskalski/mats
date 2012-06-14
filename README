@@ -2,38 +2,12 @@ This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this file,
 You can obtain one at http://mozilla.org/MPL/2.0/.
 
-This project is a work-in-progress implementation of automated Accessibility Testing Suite for Firefox,
-created by Andrzej Skalski, Mozilla
+This project is a work-in-progress implementation of automated Accessibility
+Testing Suite for Firefox, created by Andrzej Skalski while working for Mozilla
 
-the code is not runnable yet, although some desing principles are already known:
+The project was planned to be cross-platform, but it's development was paused
+before any backends other than MSAA were implemented. If you are a software
+developer who plans to continue the work, please feel free to mail me at 
+"public a-t akuda d-o-t org", since @mozilla e-mail is probably disabled now.
 
-there will be several platform-dependent test folders (test_*) containing python style unittests in sets
-there might be a single cross-platform test directory for abstracted tests at some point
-
-all configuration is to be placed in "config.ini" file, athough passing other alternative configuration files from commandline will be possible
-
-mats_runner folder is planned to deliver class set that provides a Firefox runner with abstracted interaction interface, to the point it's possible. All platform dependent details will be exposed by fields nested in a main class.
-
-The goal is to keep basic and common setup options as simple as possible, while allowing full platform-specific testing in separate subclasses.
-
-During development I will primarly focus on MSAA tests for now.
-
-The idea is that tests are run by python.unittest module
-
-Requirements:
-for all systems:
-Firefox compiled with --enable-marionette and --enable-accessibility, and ENABLE_MARIONETTE=1 added to $MC/browser/confvars.sh file as described here: https://developer.mozilla.org/en/Marionette/Setup#Running_Marionette_on_Desktop_Firefox_or_B2G_Desktop_builds
-mozbase (https://github.com/mozilla/mozbase)
-marionette_client from mozbase (it does not install automatically for some reason) 
-
-for Windows (unless ctypes error is fixed, only win32 is supported):
-comtypes (easy_install comtypes)
-ctypes (watch the OS version, http://switch.dl.sourceforge.net/project/ctypes/ctypes-win64/ contains win64 version)
-
-note on ctypes:
-win64 for python 2.5 works so far on windows 7 with python 2.7. It is possible to install it via easy_install, but either visual studio 2008 is necessary (set the environment path variable to point vcvarsall.bat, or just google) OR mingw. For mingw there is an open bug (-mno-mingw flag being dropped by recent gcc), workarouds are possible.
-
-for Linux:
-pyatspi
-and probably some more I haven't discovered yet 
-
+Please see basic_documentation.txt for installation/usage instructions.

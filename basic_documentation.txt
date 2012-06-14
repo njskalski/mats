@@ -1,15 +1,94 @@
+This file describes aims to describe MATS in terms of hi-level interface,
+and describe some of it's desing decisions and fallbacks. More implementation
+details are placed directly in code.
 
-There are (unfortunately) multiple threads in this project. Fortunately, they form a clear
-call tree - each thread is constructed and destroyed by the same owner thread,
-and ownership presents as follows:
+===============================================================================
 
-MatsRunner - this is not a thread
-	FirefoxThread
-		(embeds Mozprocess stuff)
-	MatsController
-		system specific event listner, which is not necessarly a process
+How to use it?
+
+1) do a custom build of Firefox, as described at:
+https://developer.mozilla.org/En/Simple_Firefox_build
+with a "enable-marionette" patch applied. If it's outdated, you should probably
+try checking https://developer.mozilla.org/en/Marionette/Setup , and if that
+fails as well - go IRC and ask someone at #a-team channel.
+2) install Python 32 bits, don't try with 64 even, if your OS is 64 bits. 
+Libraries that MATS rely on are not correctly updated to 64 bits.
+3) install mozilla-central/testing/marionette/client (from mozilla-central)
+4) install https://github.com/mozilla/mozbase or 
+mozilla-central/testing/mozbase (from mozilla-central), whichever is more
+recent. Personally I used the one from github.
+5) install setuptools from http://pypi.python.org/pypi/setuptools
+6) install comtypes from 
+http://sourceforge.net/projects/comtypes/files/comtypes/0.6.2/ , I doubt it got
+updated :), 32 bits of course. You can just download .exe and point it to
+easy-install if you plan to run MATS inside virtualenv.
+7) install lxml, by typing "easy_install lxml==2.3"
+8) if I remember correctly, ctypes is part of standard installation right now.
+If not - you need to install it as well, similarly to comtypes.
+Uff, now you can run MATS in this environment. Set up winconfig.ini, go to
+tests_msaa and type python test*_test.py
+
+===============================================================================
+
+What MATS can do (now)?
+
+1) run Firefox/Nightly with Marionette enabled.
+2) stop Firefox, or wait for Firefox thread to stop (depending on test needs)
+3) get full Accessible tree of Firefox. The tree inherits from
+etree.ElementTree interface, as provided by lxml, plus methods defined in
+AccessibleElement in accessible.py for every node. This allows you to navigate
+a tree quickly via xpath, and do accessibility methods calls on nodes. Please
+see limitations section of this document.
+4) it is possible to get interactive shell while Firefox is running, if you
+want to test interactively (useful in tests development and debugging).
+See pyshell.py file for details.
+5) whatever Marionette can do, it's instantiated, connected and working if
+MatsRunner.run() succeeds.
+
+What was planned?
+
+1) auto-updating accessible tree (by registering a event listener to
+MatsController and selectively updating subtrees).
+2) adding AtSpi, IA2 and possibly UIA interfaces some day.
+
+===============================================================================
+
+Limitations
+
+1) there cannot be two instances of MatsRunner running in the same time, since
+WindowsListener object is singleton, and no support for this situation were
+added. If you really need this, you have to figure out how to bound
+WinEventProc from windows_listener.py with a particualar WindowsListener
+instance.
+2) accessible_tree also uses singleton pattern for now, since for compatibility
+with lxml a mapping between xml <accesible> nodes and os-specific non-string
+reference to Accessible object is needed. This was not needed for that before
+lxml was announced (you can try checking older versions of accessilbe.py and 
+accessible_msaa.py on github). Mapping is set between integer "mapping"
+attribute in xml <accessible> nodes and (node, id) pairs in python. See
+accessible.py and accessible_msaa.py for even more details.
+3) accessible tree refreshing is not implemented now (June 14, 2012, this may
+change yet)
+
+
+===============================================================================
+
+Architecture details
+
+There are multiple threads in this project. Fortunately, they form a clear call
+tree - each thread is constructed and destroyed by the same owner thread, and 
+ownership (that never changes) presents as follows:
+
+MatsRunner (object, not thread)
+	FirefoxThread (thread)
+		runs Firefox/Nightly via MozBase components. It also sets MozProfile to
+		activate Marionette by default
+	MatsController (thread)
+		listens to system events, and calls event listeners
 		
 each thread exposes (along with obvious start() method) methods:
 stop() - stops the thread, should be called only by thread owner
-wait_for_ready() - waits until entry protocol of run() is finished, and thread object is
-	ready to receive further commands
+wait_for_ready() - waits until entry protocol of run() is finished, and thread
+object is ready to receive further commands
+
+

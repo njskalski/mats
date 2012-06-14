@@ -2,7 +2,8 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this file,
 # You can obtain one at http://mozilla.org/MPL/2.0/.
 
-#this test tests, whether EVENT_OBJECT_FOCUS is fired once a button is clicked
+#this test tests, whether EVENT_OBJECT_FOCUS is fired once a button is clicked.
+#Click action is made via Marionette interface.
 
 import sys
 sys.path.append('../')
@@ -18,7 +19,7 @@ class A11yTest1(unittest.TestCase):
         self.runner = MatsRunner(config_file = '../winconfig.ini', url = 'file://' + os.path.join(os.getcwd(), 'pages', 'test1.html'))
         self.runner.start()
         
-    def test_whatever(self):
+    def test_if_marionette_triggers_focus_event(self):
         
         self.assertEqual(True,self.runner.instantiate_a11y())
 

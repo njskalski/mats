@@ -2,9 +2,12 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this file,
 # You can obtain one at http://mozilla.org/MPL/2.0/.
 
-#this test tests, whether if Firefox stops once 'x' is clicked :)
-
-#this test presently fails, don't know why
+#This test tests, whether if Firefox stops once close system button is clicked.
+#This test presently (June 14, 2012) fails (Firefox returns error), don't know
+#why. I also left commented code that points to a different "close" button that
+#happens to be in accessible tree, and does not work. I don't know why it's
+#there, why it doesn't work, and what was MSAA intention in exposing it to user
+#but I leave it for reference. 
 
 import sys
 sys.path.append('../')
@@ -20,13 +23,13 @@ class A11yTest1(unittest.TestCase):
         self.runner = MatsRunner(config_file = '../winconfig.ini', url = 'file://' + os.path.join(os.getcwd(), 'pages', 'test1.html'))
         self.runner.start()
         
-    def test_whatever(self):
+    def test_if_firefox_stops_on_clicking_close_button(self):
         
         self.assertEqual(True, self.runner.instantiate_a11y())
 
         tree = self.runner.controller.getAccessibleTree()
         
-        #this points to something else. No clue what. The MSAA is as intuitive as quantum mechanics
+#        this points to something else. No clue what. The MSAA is as intuitive as quantum mechanics
 #        menu_buttons = tree.xpath('accessible[@name="System" and @role="2"]/accessible[@name="System" and @role="12"]/accessible[@name="System" and @role="11"]/*')
 #        #/accessible[@name="System"]/accessible[@name="System"]/accessible[@default-action="Execute" and @keyboard-shortcut="c"]')
 #        
@@ -39,7 +42,7 @@ class A11yTest1(unittest.TestCase):
 #        
 #        self.assertEqual(close_button.get('default-action'), 'Execute')
 #        pyshell.runShellHere({'runner' : self.runner, 'but' : close_button})
-#        
+        
         
         close_button = tree.xpath('accessible[@value="MSAA test1 - Nightly"]/accessible[@name="Close" and @role="43"]')
         self.assertEqual(len(close_button), 1)
