@@ -1,6 +1,13 @@
-This file describes aims to describe MATS in terms of hi-level interface,
+This file aims to describe MATS in terms of hi-level interface,
 and describe some of it's desing decisions and fallbacks. More implementation
 details are placed directly in code.
+
+This document has following sections:
+
+How to use it?
+What MATS can do (now)?
+Limitations
+Architecture details
 
 ===============================================================================
 
@@ -32,7 +39,7 @@ tests_msaa and type python test*_test.py
 
 What MATS can do (now)?
 
-1) run Firefox/Nightly with Marionette enabled.
+1) run Firefox/Nightly with Marionette enabled. It uses sandbox user profile.
 2) stop Firefox, or wait for Firefox thread to stop (depending on test needs)
 3) get full Accessible tree of Firefox. The tree inherits from
 etree.ElementTree interface, as provided by lxml, plus methods defined in
@@ -50,16 +57,19 @@ What was planned?
 1) auto-updating accessible tree (by registering a event listener to
 MatsController and selectively updating subtrees).
 2) adding AtSpi, IA2 and possibly UIA interfaces some day.
+3) more tests.
 
 ===============================================================================
 
-Limitations
+Limitations:
 
 1) there cannot be two instances of MatsRunner running in the same time, since
 WindowsListener object is singleton, and no support for this situation were
 added. If you really need this, you have to figure out how to bound
-WinEventProc from windows_listener.py with a particualar WindowsListener
-instance.
+WinEventProc from windows_listener.py with a particular WindowsListener
+instance, and remove singleton pattern. This is not "mission impossible", it
+should be possible to identify WindowsListener instance from _WinEventHook
+argument.
 2) accessible_tree also uses singleton pattern for now, since for compatibility
 with lxml a mapping between xml <accesible> nodes and os-specific non-string
 reference to Accessible object is needed. This was not needed for that before
@@ -75,8 +85,66 @@ change yet)
 
 Architecture details
 
+Files:
+
+event.py
+	a very thin wrapper around whatever data MSAA returns. No serious
+	processing where implemented yet.
+gef_config.py
+	implements get_config(config_file) method, which ensures that MATS config
+	is sane. See file header for details.
+firefox_thread.py
+	implements FirefoxThread which is responsible for running Firefox via
+	MozBase, and does some user's profile setup to activate Marionette. Also,
+	it registers dummy FirefoxThreadLogger that sends all Firefox stdout into
+	abyss. Change FirefoxThreadLogger.__call__ method if you need it for some
+	reason.
+mats_controller.py
+	chooses among available controllers judging on operating system used.
+	Import controller from here
+mats_base_controller.py
+	provides "Not implemented" messages for subclasses :)
+mats_msaa_controller.py
+	Implements a MSAA controller, that is informs listeners on new messages.
+	Calling listeners can be paused and resumed, and messages queue can be
+	emptied without calling listeners. It is very important for test
+	reliability to clean message queue before taking action that is supposed to
+	trigger a OS message - otherwise, you can get a false positive. 
+	I did my best to make it thread safe, the only application of it now can be
+	seen in mats_runner.py, method wait_for_event. 
+mats_atspi_controller.py
+	dummy file, never implemented
+pyshell.py
+	a debugging tool. RunShellHere is pretty self explanatory, just put into
+	"env" dictionary whatever objects you want to expose to embedded
+	interactive shell. fall() and falle() methods prints call stack of
+	an exception, the latter also starts interactive shell.
+	SuperHandler is a dummy class that pretends to have every single method
+	implemented. That is useful if you try to investigate what a binary library
+	does with an object. Yes, I debugged binaries. No, it didn't go well.
+winconstants.py
+	name says it all: constants specific to Windows OS. Sources in comments.
+windows_listener.py
+	implements WindowsListener object, that is not a thread. It just wraps all
+	c-style system function calls. Singleton object, see Limitations section
+	for details.
+winutils.py
+	some wrappers around Windows API methods that MatsController relies on.
+	Names are self explanatory. The active waiting was discussed in bugzilla
+	and over e-mail, but no alternative solution was found.
+accessible.py
+	defines AccessibleElement and AccessibleTree basing on lxml classes.
+	AccessibleElement implements custom _init() method to achieve bounding of
+	os-specific data to xml nodes that are re-constructed via C-proxy.
+	See http://lxml.de/element_classes.html#element-initialization for details.
+accessible_msaa.py
+	provides AccessibleElement and AccessibleTree constructors from MSAA.
+	A lot of COM to python code glue is here. 
+
+Threads:
+
 There are multiple threads in this project. Fortunately, they form a clear call
-tree - each thread is constructed and destroyed by the same owner thread, and 
+tree - each thread is constructed and destroyed by the same owner thread, and http://lxml.de/element_classes.html#element-initialization
 ownership (that never changes) presents as follows:
 
 MatsRunner (object, not thread)
@@ -86,9 +154,10 @@ MatsRunner (object, not thread)
 	MatsController (thread)
 		listens to system events, and calls event listeners
 		
-each thread exposes (along with obvious start() method) methods:
+Each thread exposes (along with obvious start() method) methods:
 stop() - stops the thread, should be called only by thread owner
 wait_for_ready() - waits until entry protocol of run() is finished, and thread
 object is ready to receive further commands
+
 
 

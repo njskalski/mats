@@ -11,9 +11,9 @@
 #- conf['Marionette']['port'] exists and is positive, integer type
 #- conf['Marionette']['port_timeout'] exists and is positive, integer type
 
-defaultMarionettePort = 2828
-defaultMarionettePortTimeout = 300
-
+#this dictionary describes a basic, default config file. You can add values
+#here, and test_and fill will make sure that their possible overrides in
+#config.ini are of same type.
 defaults = {
     'Marionette' : {
         'port' : 2828,

@@ -15,7 +15,7 @@ from platform import system
 osname = system()
 
 if osname == 'Linux':
-    pass #TODO implement accessible_atspi 
+    raise Exception("Not implemented for platform " + osname + ".") 
 elif osname == 'Windows':
     import accessible_msaa as accessible_system
 else:
@@ -23,6 +23,8 @@ else:
 
 
 class AccessibleElement(etree.ElementBase):
+    
+    #to understand this, see http://lxml.de/element_classes.html#element-initialization
     def _init(self):
         self.os_spec = AccessibleTree._singleInstance.getOsSpec(int(self.get('mapping')))
     
