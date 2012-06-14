@@ -146,7 +146,7 @@ accessible_msaa.py
 Threads:
 
 There are multiple threads in this project. Fortunately, they form a clear call
-tree - each thread is constructed and destroyed by the same owner thread, and http://lxml.de/element_classes.html#element-initialization
+tree - each thread is constructed and destroyed by the same owner thread, and 
 ownership (that never changes) presents as follows:
 
 MatsRunner (object, not thread)
