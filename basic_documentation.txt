@@ -107,7 +107,7 @@ mats_controller.py
 mats_base_controller.py
 	provides "Not implemented" messages for subclasses :)
 mats_msaa_controller.py
-	Implements a MSAA controller, that is informs listeners on new messages.
+	Implements a MSAA controller, that informs listeners on new messages.
 	Calling listeners can be paused and resumed, and messages queue can be
 	emptied without calling listeners. It is very important for test
 	reliability to clean message queue before taking action that is supposed to
