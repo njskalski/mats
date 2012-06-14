@@ -91,7 +91,7 @@ Files:
 
 event.py
 	a very thin wrapper around whatever data MSAA returns. No serious
-	processing where implemented yet.
+	processing were implemented yet.
 gef_config.py
 	implements get_config(config_file) method, which ensures that MATS config
 	is sane. See file header for details.
