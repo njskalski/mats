@@ -8,6 +8,6 @@ Testing Suite for Firefox, created by Andrzej Skalski while working for Mozilla
 The project was planned to be cross-platform, but it's development was paused
 before any backends other than MSAA were implemented. If you are a software
 developer who plans to continue the work, please feel free to mail me at 
-"public a-t akuda d-o-t org", since @mozilla e-mail is probably disabled now.
+"public a-t akuda d-o-t org".
 
 Please see basic_documentation.txt for installation/usage instructions.
