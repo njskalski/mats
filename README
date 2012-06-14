@@ -2,7 +2,7 @@ This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this file,
 You can obtain one at http://mozilla.org/MPL/2.0/.
 
-This project is a work-in-progress implementation of automated Accessibility
+This project was a work-in-progress implementation of automated Accessibility
 Testing Suite for Firefox, created by Andrzej Skalski while working for Mozilla
 
 The project was planned to be cross-platform, but it's development was paused
