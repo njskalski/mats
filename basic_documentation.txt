@@ -15,10 +15,11 @@ How to use it?
 
 1) do a custom build of Firefox, as described at:
 https://developer.mozilla.org/En/Simple_Firefox_build
-with a "enable-marionette" patch applied. If it's outdated, you should probably
-try checking https://developer.mozilla.org/en/Marionette/Setup , and if that
-fails as well - go IRC and ask someone at #a-team channel.
-2) install Python 32 bits, don't try with 64 even, if your OS is 64 bits. 
+with a "enable-marionette" (included in MATS) patch applied. If it's outdated, 
+you should probably try checking
+https://developer.mozilla.org/en/Marionette/Setup , and if that fails as well
+- go IRC and ask someone at #a-team channel.
+2) install Python 32 bits, don't try with 64 even if your OS is 64 bits. 
 Libraries that MATS rely on are not correctly updated to 64 bits.
 3) install mozilla-central/testing/marionette/client (from mozilla-central)
 4) install https://github.com/mozilla/mozbase or 
@@ -28,7 +29,8 @@ recent. Personally I used the one from github.
 6) install comtypes from 
 http://sourceforge.net/projects/comtypes/files/comtypes/0.6.2/ , I doubt it got
 updated :), 32 bits of course. You can just download .exe and point it to
-easy-install if you plan to run MATS inside virtualenv.
+easy-install if you plan to run MATS inside virtualenv. This is the one that 64
+bit version FAILS.
 7) install lxml, by typing "easy_install lxml==2.3"
 8) if I remember correctly, ctypes is part of standard installation right now.
 If not - you need to install it as well, similarly to comtypes.
