@@ -3,7 +3,11 @@
 # You can obtain one at http://mozilla.org/MPL/2.0/.
 
 # this is an abstraction layer representing an Accessible Object, os-independetly
-# it is written now only to support #TODO investigate why it never works MSAA, abstraction is to be added later
+
+#xml <accessible> node "mapping" attribute is always an integer, used to identify
+#the node in order to re-bound os_spec field (used by accessible methods) each
+#time node's python representation is reconstructed. lxml does it a lot.
+#the mapping is held in AccessibleTree, which is singleton (now). 
 
 from lxml import etree
 

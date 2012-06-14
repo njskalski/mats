@@ -4,6 +4,8 @@
 
 #this test tests, whether EVENT_OBJECT_FOCUS is fired once a button is clicked.
 #Click action is made via Accessible tree
+#this test fails for unknown reason - Firefox acts weirdly after the button is
+#clicked.
 
 import sys
 sys.path.append('../')

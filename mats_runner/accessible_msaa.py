@@ -4,13 +4,10 @@
 
 #this file is born in frustration of COM in python. Welcome to code-glue hell.
 
-#oh, btw, and guy who couln't have decided once if there should be one or two
-#underscores after each 'com' infix - make up your mind!
-
-# there are two important things to remeber while working with MSAA:
+# there are two important things to remember while working with MSAA:
 # 1) not every accessible node in tree is actually IAccessible. some of leafs in the tree
-# are represented solely as an child_id to partent IAccessible, and do not implement the
-# interface themself. In this implementation therefore, an AccessibleElement is identified
+# are represented solely as an child_id to parent IAccessible, and do not implement the
+# interface themselves. In this implementation therefore, an AccessibleElement is identified
 # as pair of (IAccessible , integer)
 # 2) child_id is 1-based, 0 means "node itself". You know, just so you make more mistakes.
 
@@ -35,6 +32,9 @@ parser.set_element_class_lookup(parser_lookup)
 Element = parser.makeelement
 
 def intToVariant(i):
+    '''
+    helper method, constructs Windows "VARIANT" object representing an integer
+    '''
     v = VARIANT()
     v.vt = VT_I4
     v.value = i
@@ -42,6 +42,16 @@ def intToVariant(i):
     return v
 
 def getAccessibleTreeFromMsaa(root):
+    '''
+    method constructing a AccessibleTree from a given root AccessibleElement.
+    
+    WARNING:
+    Please do not change order of operation. AccesibleTree constructor needs to
+    fire first, AccessibleElement._init() relies on singleton mapping it
+    provides, and for some reason _init() is called by lxml several times
+    during tree construction.
+    '''
+    
     mapping = {'num' : 0}
     at = AccessibleTree(element = None, file = None, mapping = mapping)
     root = getAccessibleElementFromMsaa(root, winconstants.CHILDID_SELF, mapping)
@@ -49,7 +59,10 @@ def getAccessibleTreeFromMsaa(root):
     return at
 
 def getAccessibleElementFromMsaa(node, id, mapping):
-    #print (node, id)
+    '''
+    creates AccessibleElement from MSAA, given the reference to AccessibleTree
+    mapping.
+    '''
     
     num = mapping['num']
     mapping['num'] += 1
@@ -83,6 +96,10 @@ def getAccessibleElementFromMsaa(node, id, mapping):
     return res
 
 def doDefaultAction(os_spec):
+    '''
+    calls accDoDefaultAction on MSAA node.
+    '''
+    
     node, id = os_spec
     
     variant = intToVariant(id)
