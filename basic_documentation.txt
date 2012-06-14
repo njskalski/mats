@@ -74,8 +74,8 @@ should be possible to identify WindowsListener instance from _WinEventHook
 argument.
 2) accessible_tree also uses singleton pattern for now, since for compatibility
 with lxml a mapping between xml <accesible> nodes and os-specific non-string
-reference to Accessible object is needed. This was not needed for that before
-lxml was announced (you can try checking older versions of accessilbe.py and 
+reference to Accessible object is needed. This was not needed before
+lxml was introduced (you can try checking older versions of accessilbe.py and 
 accessible_msaa.py on github). Mapping is set between integer "mapping"
 attribute in xml <accessible> nodes and (node, id) pairs in python. See
 accessible.py and accessible_msaa.py for even more details.
