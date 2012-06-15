@@ -113,7 +113,7 @@ def updateElement(element, mapping):
         recursiveRemoveMapping(child)
     
     new_children = getMsaaChildren(node, id)
-    element.extend([getAccessibleElementFromMsaa(node, id, mapping) for (node, id) in children])
+    element.extend([getAccessibleElementFromMsaa(node, id, mapping) for (node, id) in new_children])
     
 
 def doDefaultAction(os_spec):

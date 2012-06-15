@@ -2,10 +2,12 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this file,
 # You can obtain one at http://mozilla.org/MPL/2.0/.
 
-#this test tests, whether EVENT_OBJECT_FOCUS is fired once a button is clicked.
-#Click action is made via Accessible tree
-#this test fails for unknown reason - Firefox acts weirdly after the button is
-#clicked.
+#this is a basic test of AccessibleTree facilities working. It checks:
+# accessibleTree construction
+# accessibleTree navigation via xpath
+# accessibleTree xml getters
+# accessibleTree custom node methods (MSAA)
+# accessibleTree updating (manual)
 
 import sys
 sys.path.append('../')
@@ -35,24 +37,33 @@ class A11yTest1(unittest.TestCase):
         FilePopup = FileButton[0]
         self.assertEqual(len(FilePopup), 0) #that has no children
         
+        FilePopup = None #removing old
         #until is clicked.
         
         FileButton.do_default_action()
-        
         FileButton.update()
         
-        print 'fb len : ' + str(len(FileButton))
-        print 'fb :' + str(FileButton)
+        self.assertGreater(len(FileButton), 1) # check for newcomer
         
+        FilePopup2 = FileButton[1] #get him
         
+        self.assertGreater(FilePopup2.get("height"), 0) #he should be visible.
         
-        self.assertTrue(
-            self.runner.wait_for_event('EVENT_OBJECT_FOCUS', button.do_default_action, timeout = 10)
-            )
-        pass
+#        print 'fb len : ' + str(len(FileButton))
+#        for child in FileButton:
+#            print str(child.items())
+#            for sub in child:
+#                print 'sub:' + str(sub.items())
+
+        ExitButton = FilePopup2.xpath('accessible[@name="Exit" and @role="menuitem"]')
+        self.assertEqual(len(ExitButton), 1)
+        ExitButton = ExitButton[0]
+        
+        self.assertTrue(ExitButton.do_default_action())
+        
+        self.runner.wait_for_stop()
             
     def tearDown(self):
-        self.runner.stop()
         pass
         
 
