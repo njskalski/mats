@@ -42,6 +42,10 @@ class AccessibleElement(etree.ElementBase):
     def select(self, flag):
         return accessible_system.select(self.os_spec, flag)
     
+    def update(self):
+        mapping = AccessibleTree._singleInstance.mapping
+        accessible_system.updateElement(self, mapping) 
+            
 class AccessibleTree(etree._ElementTree):
     '''
     for now this is singleton :(

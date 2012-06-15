@@ -95,6 +95,27 @@ def getAccessibleElementFromMsaa(node, id, mapping):
             
     return res
 
+def updateElement(element, mapping):
+    '''
+    this method updates a single element by permanently removing all it's children
+    and regenerating subtree. It *does not* update argument element itself.
+    '''
+    
+    def recursiveRemoveMapping(element, mapping):
+        mapping_key = int(element.get("mapping"))
+        del mapping[mapping_key]
+        for child in element:
+            recursiveRemoveMapping(child)
+            
+    node, id = element.os_spec
+    
+    for child in element:
+        recursiveRemoveMapping(child)
+    
+    new_children = getMsaaChildren(node, id)
+    element.extend([getAccessibleElementFromMsaa(node, id, mapping) for (node, id) in children])
+    
+
 def doDefaultAction(os_spec):
     '''
     calls accDoDefaultAction on MSAA node.
