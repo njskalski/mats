@@ -101,7 +101,7 @@ def updateElement(element, mapping):
     and regenerating subtree. It *does not* update argument element itself.
     '''
     
-    def recursiveRemoveMapping(element, mapping):
+    def recursiveRemoveMapping(element):
         mapping_key = int(element.get("mapping"))
         del mapping[mapping_key]
         for child in element:
@@ -188,10 +188,10 @@ def putValue(os_spec, input_string):
 
 def getRole(node, id):
     variant = intToVariant(id)
-    res = VARIANT(0, VT_I4)
+    res = intToVariant(0)
     HRESULT = node._IAccessible__com__get_accRole(variant, byref(res))
     if HRESULT == comtypes.hresult.S_OK:
-        return str(res.value) #TODO map it to string 
+        return getRoleName(res.value) 
     elif HRESULT == comtypes.hresult.E_INVALIDARG:
         raise Exception("Invalid argument")
     else:
@@ -389,4 +389,19 @@ def getMsaaChildren(node, id):
         
         children = [(x.value, winconstants.CHILDID_SELF) if x.vt == VT_DISPATCH else (node, x.value) for x in array] #see comment in the beginnning of the file        
         
-        return children 
+        return children
+    
+#a function below is adapted from pyia https://github.com/eeejay/pyia
+
+def getAccStateSetFromInt(state_int):
+    states = []
+    for shift in xrange(64):
+        state_bit = 1 << shift
+        if state_bit & state_int:
+            states.append(
+                winconstants.UNLOCALIZED_STATE_NAMES.get(
+                    (state_bit & state), 'unknown'))
+    return states
+
+def getRoleName(role_int):
+    return winconstants.UNLOCALIZED_ROLE_NAMES.get(role_int, 'unknown')

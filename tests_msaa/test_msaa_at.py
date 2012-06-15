@@ -21,16 +21,30 @@ class A11yTest1(unittest.TestCase):
         self.runner = MatsRunner(config_file = '../winconfig.ini', url = 'file://' + os.path.join(os.getcwd(), 'pages', 'test1.html'))
         self.runner.start()
         
-    def test_msaa_focus(self):
-        
+    def test_msaa_at(self):
         self.assertEqual(True, self.runner.instantiate_a11y())
-
         tree = self.runner.controller.getAccessibleTree()
 
-        button = tree.xpath('//*[@name="Click me" and @role="pushbutton"]')
+        FileButton = tree.xpath('//*[@name="File" and @keyboard-shortcut="Alt+F" and @role="menuitem"]')
         
-        self.assertEqual(len(button), 1)
-        button = button[0]
+        self.assertEqual(len(FileButton), 1)
+        FileButton = FileButton[0]
+        
+        self.assertEqual(len(FileButton), 1) #it should have a single child now
+        
+        FilePopup = FileButton[0]
+        self.assertEqual(len(FilePopup), 0) #that has no children
+        
+        #until is clicked.
+        
+        FileButton.do_default_action()
+        
+        FileButton.update()
+        
+        print 'fb len : ' + str(len(FileButton))
+        print 'fb :' + str(FileButton)
+        
+        
         
         self.assertTrue(
             self.runner.wait_for_event('EVENT_OBJECT_FOCUS', button.do_default_action, timeout = 10)

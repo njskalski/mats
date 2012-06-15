@@ -44,7 +44,7 @@ class A11yTest1(unittest.TestCase):
 #        pyshell.runShellHere({'runner' : self.runner, 'but' : close_button})
         
         
-        close_button = tree.xpath('accessible[@value="MSAA test1 - Nightly"]/accessible[@name="Close" and @role="43"]')
+        close_button = tree.xpath('accessible[@value="MSAA test1 - Nightly"]/accessible[@name="Close" and @role="pushbutton"]')
         self.assertEqual(len(close_button), 1)
         close_button = close_button[0]
         self.assertEqual(close_button.get('default-action'), 'Press') 
