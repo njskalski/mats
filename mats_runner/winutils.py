@@ -18,6 +18,15 @@ def loadIAccessible():
     comtypes.client.GetModule('oleacc.dll')
     return comtypes.gen.Accessibility.IAccessible
 
+def loadIAccessible2Module():
+    '''
+    Loads entire IAccessible2 API from ia2_api_all.tlb, and returns
+    the entire gen MODULE (NOT just interface), since the module name is 
+    generated weirdly
+    '''
+    comtypes.client.GetModule('../ia2_api_all.tlb')
+    return comtypes.gen._C974E070_3787_490A_87B0_E333B06CA1E2_0_1_2
+
 def getNightliesByPID(PID):
     result = []
     def getWindowCallback(hwnd, res):
@@ -41,3 +50,13 @@ def getAccessibleObjectFromWindow(hwnd):
         ctypes.byref(comtypes.gen.Accessibility.IAccessible._iid_),
         ctypes.byref(ptr))
     return ptr
+
+def getAccessible2ObjectFromWindow(hwnd):
+    ptr = ctypes.POINTER(comtypes.gen._C974E070_3787_490A_87B0_E333B06CA1E2_0_1_2.IAccessible2)()
+    res = ctypes.oledll.oleacc.AccessibleObjectFromWindow(
+        hwnd,
+        0,
+        ctypes.byref(comtypes.gen._C974E070_3787_490A_87B0_E333B06CA1E2_0_1_2.IAccessible2._iid_),
+        ctypes.byref(ptr))
+    return ptr
+

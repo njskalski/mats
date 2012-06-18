@@ -9,6 +9,10 @@
 # accessibleTree custom node methods (MSAA)
 # accessibleTree updating (manual)
 
+# this tests ends with Firefox error:
+# ASSERTION: Component Manager being held past XPCOM shutdown.: 'cnt == 0', file ...nsXPComInit.cpp
+# I don't know why
+
 import sys
 sys.path.append('../')
 
