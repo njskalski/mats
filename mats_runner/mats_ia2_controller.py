@@ -34,6 +34,7 @@ class MatsIA2Controller(MatsBaseController):
         print 'Controller got the HWND, and it is ' + str(self.hwnd)
         
         #just some shortcuts
+        self.IAccessible = winutils.loadIAccessible()
         self.IA2Module = winutils.loadIAccessible2Module()
         self.IAccesssible2 = self.IA2Module.IAccessible2
         self.Accessible2Object = winutils.getAccessible2ObjectFromWindow(hwnd = self.hwnd)

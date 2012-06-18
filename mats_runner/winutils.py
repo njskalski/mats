@@ -52,11 +52,12 @@ def getAccessibleObjectFromWindow(hwnd):
     return ptr
 
 def getAccessible2ObjectFromWindow(hwnd):
-    ptr = ctypes.POINTER(comtypes.gen._C974E070_3787_490A_87B0_E333B06CA1E2_0_1_2.IAccessible2)()
-    res = ctypes.oledll.oleacc.AccessibleObjectFromWindow(
-        hwnd,
-        0,
-        ctypes.byref(comtypes.gen._C974E070_3787_490A_87B0_E333B06CA1E2_0_1_2.IAccessible2._iid_),
-        ctypes.byref(ptr))
-    return ptr
+    ia = getAccessibleObjectFromWindow(hwnd)
+    ia2m = comtypes.gen._C974E070_3787_490A_87B0_E333B06CA1E2_0_1_2
+    void_ptr = ctypes.c_void_p()
+    ia._IUnknown__com_QueryInterface(ia2m.IAccessible2._iid_, ctypes.byref(void_ptr))
+    return void_ptr
+    #import pyshell
+    #pyshell.runShellHere({'ia2m' : ia2m, 'ia' : ia, 'vp' : void_ptr })
+    
 

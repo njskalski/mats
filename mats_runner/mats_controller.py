@@ -8,7 +8,8 @@ osname = system()
 if osname == 'Linux':
     from mats_atspi_controller import MatsAtspiController as MatsController
 elif osname == 'Windows':
-    from mats_msaa_controller import MatsMsaaController as MatsController
+    #from mats_msaa_controller import MatsMsaaController as MatsController
+    from mats_ia2_controller import MatsIA2Controller as MatsController
 else:
     raise Exception("Unsupported platform " + osname + ".")
 
