@@ -68,17 +68,21 @@ def getAccessibleElementFromMsaa(node, id, mapping):
     mapping['num'] += 1
     mapping[num] = (node, id)
     
+    role = getRole(node, id)
+    
     attrib = {
               'name' : getName(node, id),
               'description' : getDescription(node, id), 
               'value' : getValue(node, id),
-              'role' : getRole(node, id),
+              'role' : role,
               'state' : getState(node,id),
               'default-action' : getDefaultAction(node,id),
               'help' : getHelp(node,id),
               'keyboard-shortcut' : getKeyboardShortcut(node,id),
               'child-id' : str(id),
               }
+    
+    
     
     location = getLocation(node, id)
     for k, v in location.iteritems():
