@@ -21,6 +21,9 @@ class A11yTest1(unittest.TestCase):
         self.runner.start()
         
     def test_tree_to_xml_works(self):
+        self.assertEqual(True,self.runner.instantiate_a11y())
+        self.assertEqual(True, self.runner.is_a11y_instantiated())
+        
         tree = self.runner.controller.getAccessibleTree()
         
         xml_output = open("XML_output.xml", "w")

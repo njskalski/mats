@@ -9,6 +9,30 @@ import ctypes.wintypes
 import comtypes
 import comtypes.client
 
+ia2interfaceNames = [
+    'IAccessible2',
+    'IAccessibleAction',
+    'IAccessibleApplication',
+    'IAccessibleComponent',
+    'IAccessibleEditableText',
+    'IAccessibleHyperlink',
+    'IAccessibleHypertext',
+    'IAccessibleImage',
+    'IAccessibleRelation',
+    'IAccessibleTable',
+    'IAccessibleTable2',
+    'IAccessibleTableCell',
+    'IAccessibleText',
+    'IAccessibleValue',
+    ]
+
+def getIA2InterfacesFromModule(m):
+    res = {}
+    for name in ia2interfaceNames:
+        iface = getattr(m, name)
+        res[name] = iface
+    return res
+
 def loadIAccessible():
     '''
     Imports oleacc.dll into comtypes.gen namcespace, creating Accessibility
@@ -54,23 +78,21 @@ def getAccessibleObjectFromWindow(hwnd):
 def getAccessible2ObjectFromMSAA(msaa):
     ia = msaa
     ia2m = comtypes.gen._C974E070_3787_490A_87B0_E333B06CA1E2_0_1_2
+    
     void_ptr = ctypes.c_void_p()
 
-    #this is very bad written navigation    
-    from accessible_msaa import getChildCount, getMsaaChildren, getName, getRole
-    # we jump over menubar(0), titlebar(1), another menubar(2), to get to application...
-    assert(getChildCount(ia, 0) > 3)
-    children = getMsaaChildren(ia, 0)
-    assert(children[4][1] == 0) #assert it's a standalone "node"
-    ia = children[4][0]
-    for ia in children:
-        print 'name :' + str(getName(ia[0], ia[1])) + "\t\t role: " + str(getRole(ia[0], ia[1]))
-        ia = ia[0]
+    nif = getIA2InterfacesFromModule(ia2m)
+    for name, iface in nif.iteritems():
         try:
-            ia._IUnknown__com_QueryInterface(ia2m.IAccessible2._iid_, ctypes.byref(void_ptr))
-            print "SUCCESS"
+            #ia._IUnknown__com_QueryInterface(iface._iid_, ctypes.byref(void_ptr))
+            ia.QueryInterface(iface)#, ctypes.byref(void_ptr))
+            print "interface " + name + " is implemented."
         except Exception as e:
-            print e
+            #if e.text.startswith("No such interface supported"):
+            #    pass
+            #else:
+            print e 
+            
             
     return void_ptr
     
