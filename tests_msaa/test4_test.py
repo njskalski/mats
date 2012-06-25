@@ -38,9 +38,10 @@ class A11yTest1(unittest.TestCase):
         
         def bfs(queue):
             while not len(queue) == 0:
+                
                 actnode = queue[0]
+                print actnode.get("role")
                 queue = queue[1:] 
-                print actnode
                 winutils.getAccessible2ObjectFromMSAA(actnode.os_spec[0])
                 
                 for child in actnode:
@@ -48,6 +49,12 @@ class A11yTest1(unittest.TestCase):
         
         bfs([app_handle])
         
+        
+        ifs = winutils.getAccessible2ObjectFromMSAA(app_handle.os_spec[0])
+        
+        print ifs
+        
+        pyshell.runShellHere({'ifs': ifs, 'ia2m' : ia2m})
         #ia2object = winutils.getAccessible2ObjectFromMSAA(app_handle.os_spec[0])
         
         #self.runner.wait_for_stop()

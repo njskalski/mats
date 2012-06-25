@@ -79,21 +79,31 @@ def getAccessible2ObjectFromMSAA(msaa):
     ia = msaa
     ia2m = comtypes.gen._C974E070_3787_490A_87B0_E333B06CA1E2_0_1_2
     
-    void_ptr = ctypes.c_void_p()
+    sp = ia.QueryInterface(comtypes.IServiceProvider)
+    
+    #void_ptr = ctypes.c_void_p()
 
+    impls = [] 
     nif = getIA2InterfacesFromModule(ia2m)
     for name, iface in nif.iteritems():
         try:
-            #ia._IUnknown__com_QueryInterface(iface._iid_, ctypes.byref(void_ptr))
-            ia.QueryInterface(iface)#, ctypes.byref(void_ptr))
-            print "interface " + name + " is implemented."
+          ugabugaggagagaga!
+            impl = sp.QueryService(ia2m.IUnknown._iid_, iface)
+            #impl = sp._IServiceProvider__com_QueryService(byref(iface._iid_))
+            dir(sp)
+            
+            impls.append(impl)
+            print "SUCCESS interface " + name + " is implemented."
         except Exception as e:
-            #if e.text.startswith("No such interface supported"):
-            #    pass
-            #else:
-            print e 
+            if hasattr(e, 'text'):
+                if e.text.startswith("No such interface supported"): #or\
+                    #e.text.startswith("The parameter is incorrect."):
+                    pass
+                else:
+                    print e
+            #import pyshell 
+            #pyshell.falle(e, {'sp' : sp, 'nif': nif })
             
-            
-    return void_ptr
+    return impls
     
 
